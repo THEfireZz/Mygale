@@ -14,7 +14,30 @@ find_package(Qt6 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(Mygale src/main.cpp)
+#add the source files
+set(SOURCES
+        src/main.cpp
+        src/App/AppController.cpp
+        src/App/MainWindow.cpp
+)
+
+#add the header files
+set(HEADERS
+        src/App/AppController.h++
+        src/App/MainWindow.h++
+)
+
+#add the ui files
+set(UIS
+        resources/ui/MainWindow.ui
+)
+
+add_executable(Mygale
+        ${SOURCES}
+        ${HEADERS}
+        ${UIS}
+)
+
 target_link_libraries(Mygale
         Qt::Core
         Qt::Gui
