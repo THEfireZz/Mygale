@@ -16,3 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow() {
     delete ui;
 }
+
+JobCreationWidget *MainWindow::getJobCreationWidget() const {
+    return ui->jobCreationTab;
+}

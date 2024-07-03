@@ -20,6 +20,8 @@ set(SOURCES
         src/App/AppController.cpp
         src/App/MainWindow.cpp
         src/JobCreation/JobCreationWidget.cpp
+        src/JobCreation/JobCreation.cpp
+        src/JobCreation/JobCreation.h++
 )
 
 #add the header files

@@ -6,7 +6,7 @@
 #define MYGALE_MAINWINDOW_H
 
 #include <QMainWindow>
-
+#include "../JobCreation/JobCreationWidget.h++"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -19,6 +19,10 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
 
     ~MainWindow() override;
+
+    //Ui getter
+
+    [[nodiscard]] JobCreationWidget *getJobCreationWidget() const;
 
 private:
     Ui::MainWindow *ui;
