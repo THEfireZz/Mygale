@@ -19,17 +19,20 @@ set(SOURCES
         src/main.cpp
         src/App/AppController.cpp
         src/App/MainWindow.cpp
+        src/JobCreation/JobCreationWidget.cpp
 )
 
 #add the header files
 set(HEADERS
         src/App/AppController.h++
         src/App/MainWindow.h++
+        src/JobCreation/JobCreationWidget.h++
 )
 
 #add the ui files
 set(UIS
         resources/ui/MainWindow.ui
+        resources/ui/JobCreationWidget.ui
 )
 
 add_executable(Mygale
