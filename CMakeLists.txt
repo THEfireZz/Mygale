@@ -14,7 +14,7 @@ find_package(Qt6 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(Mygale main.cpp)
+add_executable(Mygale src/main.cpp)
 target_link_libraries(Mygale
         Qt::Core
         Qt::Gui
