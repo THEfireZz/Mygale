@@ -93,49 +93,6 @@ void JobCreationWidget::connectSignalsAndSlots() {
             [this](bool checked) { analysisCheckBoxToggled(checked); });
 }
 
-/**
- * @class JobCreationWidget
- * @brief This method handles the toggling of the single image radio button
- *
- * @param checked The state of the radio button
- **/
-void JobCreationWidget::singleImageRadioButtonToggled(bool checked) {
-    getSingleImageLabel()->setEnabled(checked);
-    getSingleImageSpinBox()->setEnabled(checked);
-
-    if (checked) {
-        getBatchCalculationCheckBox()->setChecked(false);
-        getBatchCalculationCheckBox()->setEnabled(false);
-    }
-}
-
-/**
- * @class JobCreationWidget
- * @brief This method handles the toggling of the multiple images radio button
- *
- * @param checked The state of the radio button
- **/
-void JobCreationWidget::multipleImagesRadioButtonToggled(bool checked) {
-    getFirstImageSpinBox()->setEnabled(checked);
-    getFirstImageLabel()->setEnabled(checked);
-
-    getLastImageSpinBox()->setEnabled(checked);
-    getLastImageLabel()->setEnabled(checked);
-
-    getBatchCalculationCheckBox()->setEnabled(checked);
-}
-
-/**
- * @class JobCreationWidget
- * @brief This method handles the toggling of the batch calculation check box
- *
- * @param checked The state of the check box
- **/
-void JobCreationWidget::batchCalculationCheckBoxToggled(bool checked) {
-    getBatchCalculationSpinBox()->setEnabled(checked);
-    getBatchCalculationLabel()->setEnabled(checked);
-}
-
 QCheckBox *JobCreationWidget::getImagesNameCheckBox() {
     return ui->imagesNameCheckBox;
 }
@@ -196,6 +153,55 @@ QCheckBox *JobCreationWidget::getResubmissionCheckBox() {
     return ui->resubmissionCheckBox;
 }
 
+/**
+ * @class JobCreationWidget
+ * @brief This method handles the toggling of the single image radio button
+ *
+ * @param checked The state of the radio button
+ **/
+void JobCreationWidget::singleImageRadioButtonToggled(bool checked) {
+    getSingleImageLabel()->setEnabled(checked);
+    getSingleImageSpinBox()->setEnabled(checked);
+
+    if (checked) {
+        getBatchCalculationCheckBox()->setChecked(false);
+        getBatchCalculationCheckBox()->setEnabled(false);
+    }
+}
+
+/**
+ * @class JobCreationWidget
+ * @brief This method handles the toggling of the multiple images radio button
+ *
+ * @param checked The state of the radio button
+ **/
+void JobCreationWidget::multipleImagesRadioButtonToggled(bool checked) {
+    getFirstImageSpinBox()->setEnabled(checked);
+    getFirstImageLabel()->setEnabled(checked);
+
+    getLastImageSpinBox()->setEnabled(checked);
+    getLastImageLabel()->setEnabled(checked);
+
+    getBatchCalculationCheckBox()->setEnabled(checked);
+}
+
+/**
+ * @class JobCreationWidget
+ * @brief This method handles the toggling of the batch calculation check box
+ *
+ * @param checked The state of the check box
+ **/
+void JobCreationWidget::batchCalculationCheckBoxToggled(bool checked) {
+    getBatchCalculationSpinBox()->setEnabled(checked);
+    getBatchCalculationLabel()->setEnabled(checked);
+}
+
+/**
+ * @class JobCreationWidget
+ * @brief This method handles the toggling of the images name check box
+ *
+ * @param checked The state of the check box
+ **/
 void JobCreationWidget::imagesNameCheckBoxToggled(bool checked) {
     getImagesNameLineEdit()->setEnabled(checked);
     getAnalysisCheckBox()->setEnabled(checked);
@@ -207,9 +213,22 @@ void JobCreationWidget::imagesNameCheckBoxToggled(bool checked) {
 
 }
 
+/**
+ * @class JobCreationWidget
+ * @brief This method handles the toggling of the images format check box
+ *
+ * @param checked The state of the check box
+ **/
 void JobCreationWidget::imagesFormatCheckBoxToggled(bool checked) {
     getImagesFormatComboBox()->setEnabled(checked);
 }
+
+/**
+ * @class JobCreationWidget
+ * @brief This method handles the toggling of the cpu check box
+ *
+ * @param checked The state of the check box
+ **/
 
 void JobCreationWidget::cpuCheckBoxToggled(bool checked) {
     getMinCpuLabel()->setEnabled(checked);
@@ -219,12 +238,24 @@ void JobCreationWidget::cpuCheckBoxToggled(bool checked) {
     getMaxCpuSpinBox()->setEnabled(checked);
 }
 
+/**
+ * @class JobCreationWidget
+ * @brief This method handles the toggling of the memory check box
+ *
+ * @param checked The state of the check box
+ **/
 void JobCreationWidget::memoryCheckBoxToggled(bool checked) {
     getMemoryLabel()->setEnabled(checked);
     getMemorySpinBox()->setEnabled(checked);
     getMemorySuffixLabel()->setEnabled(checked);
 }
 
+/**
+ * @class JobCreationWidget
+ * @brief This method handles the toggling of the analysis check box
+ *
+ * @param checked The state of the check box
+ **/
 void JobCreationWidget::analysisCheckBoxToggled(bool checked) {
     getResubmissionCheckBox()->setEnabled(checked);
 }
