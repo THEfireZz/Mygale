@@ -1,0 +1,26 @@
+//
+// Created by SD43247 on 03/07/2024.
+//
+
+#ifndef MYGALE_APPCONTROLLER_H
+#define MYGALE_APPCONTROLLER_H
+
+#include <memory>
+#include "MainWindow.h++"
+
+
+class AppController : public QObject {
+
+public:
+    explicit AppController(QObject *parent = nullptr);
+
+    ~AppController() override = default;
+
+    void initialize();
+
+private:
+    std::unique_ptr<MainWindow> main_window_;
+};
+
+
+#endif //MYGALE_APPCONTROLLER_H
