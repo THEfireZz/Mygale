@@ -29,7 +29,9 @@ private:
 
     void openOutputFolderDialog();
 
-    QStringList getJobTypesFromConfigFile(const QString &configFilePath);
+    static QStringList getJobTypesFromConfigFile(const QString &configFilePath);
+
+    static QStringList getFormatsFromConfigFile(const QString &configFilePath, const QString &jobType);
 };
 
 

@@ -19,6 +19,9 @@ void JobCreation::initialize() {
 
     QStringList job_types = getJobTypesFromConfigFile(config_file_path_);
     job_creation_widget_->getJobTypeComboBox()->addItems(job_types);
+
+    QStringList formats = getFormatsFromConfigFile(config_file_path_, job_creation_widget_->getJobTypeComboBox()->currentText());
+    job_creation_widget_->getImagesFormatComboBox()->addItems(formats);
 }
 
 void JobCreation::connectSignalsAndSlots() {
@@ -133,4 +136,51 @@ QStringList JobCreation::getJobTypesFromConfigFile(const QString &configFilePath
 
 }
 
+QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath, const QString &jobType) {
+    /*		<Option>
+			<name>Maya_2020/Vray</name>
+			<skeleton>squeletteMaya_2020Vray.txt</skeleton>
+			<Format>Microsoft Windows Bitmap [*.bmp]</Format>
+			<Format>JPEG [*.jpg]</Format>
+			<Format>PNG [*.png]</Format>
+			<Format>Silicon Graphics [*.sgi]</Format>
+			<Format>Softimage [*.pic]</Format>
+			<Format>Targa [*.tga]</Format>
+			<Format>TIFF [*.tif]</Format>
+			<NameOption>-im </NameOption>
+			<FormatOption>-of </FormatOption>
+			<CameraOption>-cam </CameraOption>
+		</Option>
+     */
+    QStringList formats;
+    QFile file(configFilePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        throw std::runtime_error("Could not open file : " + configFilePath.toStdString());
+    }
 
+    QXmlStreamReader xmlReader(&file);
+
+    while(!xmlReader.atEnd() && !xmlReader.hasError()) {
+        xmlReader.readNext();
+        if (!xmlReader.isStartElement() || xmlReader.name().toString() != "Option") {
+            continue;
+        }
+
+        while (xmlReader.readNextStartElement()) {
+            if (xmlReader.name().toString() == "name" && xmlReader.readElementText() == jobType) {
+                while (xmlReader.readNextStartElement()) {
+                    if (xmlReader.name().toString() == "Format") {
+                        formats.append(xmlReader.readElementText());
+                    } else {
+                        xmlReader.skipCurrentElement();
+                    }
+                }
+            } else {
+                xmlReader.skipCurrentElement();
+            }
+        }
+    }
+
+    file.close();
+    return formats;
+}
