@@ -6,6 +6,7 @@
 #define MYGALE_JOBCREATION_H
 
 #include <QLineEdit>
+#include <QFileDialog>
 #include "JobCreationWidget.h++"
 
 class JobCreation {
@@ -21,6 +22,10 @@ private:
     void connectSignalsAndSlots();
 
     void incrementJobNumber();
+
+    void openSceneFileDialog();
+
+    void openOutputFolderDialog();
 };
 
 

@@ -18,6 +18,14 @@ void JobCreation::connectSignalsAndSlots() {
     QAbstractButton::connect(job_creation_widget_->getJobNameToolButton(), &QAbstractButton::clicked, [this] {
         incrementJobNumber();
     });
+
+    QAbstractButton::connect(job_creation_widget_->getSceneToolButton(), &QAbstractButton::clicked, [this] {
+        openSceneFileDialog();
+    });
+
+    QAbstractButton::connect(job_creation_widget_->getOutputToolButton(), &QAbstractButton::clicked, [this] {
+        openOutputFolderDialog();
+    });
 }
 
 
@@ -39,6 +47,35 @@ void JobCreation::incrementJobNumber() {
 
     QString new_job_name = job_name + "_" + QString::number(suffix);
     job_creation_widget_->getJobNameLineEdit()->setText(new_job_name);
+}
+
+void JobCreation::openSceneFileDialog() {
+    QString filter;
+    //Blender or Maya_2020/Vray // Maya_2023/Vray or vred
+    if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender") {
+        filter = "Scene Files (*.blend)";
+    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray" ||
+               job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
+        filter = "Scene Files (*.ma *.mb)";
+    } else if(job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred") {
+        filter = "Scene Files (*.vpb)";
+    } else {
+        filter = "Scene Files (*.blend *.ma *.mb *.vpb)";
+    }
+
+    QString file_name = QFileDialog::getOpenFileName(job_creation_widget_, "Open Scene File", "I://", filter);
+    if (file_name.isEmpty()) {
+        return;
+    }
+    job_creation_widget_->getSceneLineEdit()->setText(file_name);
+}
+
+void JobCreation::openOutputFolderDialog() {
+    QString output_folder = QFileDialog::getExistingDirectory(job_creation_widget_, "Select Output Folder", "I://");
+    if (output_folder.isEmpty()) {
+        return;
+    }
+    job_creation_widget_->getOutputLineEdit()->setText(output_folder);
 }
 
 

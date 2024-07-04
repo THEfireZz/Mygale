@@ -161,6 +161,26 @@ QToolButton *JobCreationWidget::getJobNameToolButton() {
     return ui->jobNameToolButton;
 }
 
+QLineEdit *JobCreationWidget::getSceneLineEdit() {
+    return ui->sceneLineEdit;
+}
+
+QToolButton *JobCreationWidget::getSceneToolButton() {
+    return ui->sceneToolButton;
+}
+
+QLineEdit *JobCreationWidget::getOutputLineEdit() {
+    return ui->outputLineEdit;
+}
+
+QToolButton *JobCreationWidget::getOutputToolButton() {
+    return ui->outputToolButton;
+}
+
+QComboBox *JobCreationWidget::getJobTypeComboBox() {
+    return ui->jobTypeComboBox;
+}
+
 /**
  * @class JobCreationWidget
  * @brief This method handles the toggling of the single image radio button
@@ -267,5 +287,9 @@ void JobCreationWidget::memoryCheckBoxToggled(bool checked) {
 void JobCreationWidget::analysisCheckBoxToggled(bool checked) {
     getResubmissionCheckBox()->setEnabled(checked);
 }
+
+
+
+
 
 

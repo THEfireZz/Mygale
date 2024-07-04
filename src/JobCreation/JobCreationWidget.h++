@@ -85,6 +85,18 @@ public:
 
     [[nodiscard]] QToolButton *getJobNameToolButton();
 
+    [[nodiscard]] QLineEdit *getSceneLineEdit();
+
+    [[nodiscard]] QToolButton *getSceneToolButton();
+
+    [[nodiscard]] QLineEdit *getOutputLineEdit();
+
+    [[nodiscard]] QToolButton *getOutputToolButton();
+
+    [[nodiscard]] QComboBox *getJobTypeComboBox();
+
+
+
 
 
 
