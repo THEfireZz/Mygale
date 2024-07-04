@@ -2,8 +2,12 @@
 // Created by SD43247 on 03/07/2024.
 //
 
+#include <utility>
+
 #include "JobCreation.h++"
 
+JobCreation::JobCreation(JobCreationWidget *job_creation_widget, QString configFilePath) : job_creation_widget_(job_creation_widget), config_file_path_(std::move(configFilePath)){
+}
 
 /**
  * @class JobCreation
@@ -12,6 +16,9 @@
 void JobCreation::initialize() {
     job_creation_widget_->initialize();
     connectSignalsAndSlots();
+
+    QStringList job_types = getJobTypesFromConfigFile(config_file_path_);
+    job_creation_widget_->getJobTypeComboBox()->addItems(job_types);
 }
 
 void JobCreation::connectSignalsAndSlots() {
@@ -28,10 +35,10 @@ void JobCreation::connectSignalsAndSlots() {
     });
 }
 
-
-JobCreation::JobCreation(JobCreationWidget *job_creation_widget) : job_creation_widget_(job_creation_widget) {
-}
-
+/**
+ * @class JobCreation
+ * @brief This method increments the job number in the job name line edit
+ **/
 void JobCreation::incrementJobNumber() {
     QString job_name = job_creation_widget_->getJobNameLineEdit()->text();
     if (job_name.isEmpty()) {
@@ -49,6 +56,10 @@ void JobCreation::incrementJobNumber() {
     job_creation_widget_->getJobNameLineEdit()->setText(new_job_name);
 }
 
+/**
+ * @class JobCreation
+ * @brief This method opens a file dialog to select a scene file and sets the path in the scene line edit
+ **/
 void JobCreation::openSceneFileDialog() {
     QString filter;
     //Blender or Maya_2020/Vray // Maya_2023/Vray or vred
@@ -57,7 +68,7 @@ void JobCreation::openSceneFileDialog() {
     } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray" ||
                job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
         filter = "Scene Files (*.ma *.mb)";
-    } else if(job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred") {
+    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred") {
         filter = "Scene Files (*.vpb)";
     } else {
         filter = "Scene Files (*.blend *.ma *.mb *.vpb)";
@@ -70,12 +81,56 @@ void JobCreation::openSceneFileDialog() {
     job_creation_widget_->getSceneLineEdit()->setText(file_name);
 }
 
+/**
+ * @class JobCreation
+ * @brief This method opens a file dialog to select an output folder and sets the path in the output line edit
+ **/
 void JobCreation::openOutputFolderDialog() {
     QString output_folder = QFileDialog::getExistingDirectory(job_creation_widget_, "Select Output Folder", "I://");
     if (output_folder.isEmpty()) {
         return;
     }
     job_creation_widget_->getOutputLineEdit()->setText(output_folder);
+}
+
+/**
+ * @class JobCreation
+ * @brief This method reads the xml file and returns a list of job types
+ *
+ * @param configFilePath the path to xml file containing the job types
+ *
+ * @return a list of job types
+ *
+ * @throw runtime_error if the file could not be opened
+ **/
+
+QStringList JobCreation::getJobTypesFromConfigFile(const QString &configFilePath) {
+    QStringList job_types;
+    QFile file(configFilePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        throw std::runtime_error("Could not open file : " + configFilePath.toStdString());
+    }
+
+    QXmlStreamReader xmlReader(&file);
+
+    while(!xmlReader.atEnd() && !xmlReader.hasError()) {
+        xmlReader.readNext();
+        if (!xmlReader.isStartElement() || xmlReader.name().toString() != "Option") {
+            continue;
+        }
+
+        while (xmlReader.readNextStartElement()) {
+            if (xmlReader.name().toString() == "name") {
+                job_types.append(xmlReader.readElementText());
+            } else {
+                xmlReader.skipCurrentElement();
+            }
+        }
+    }
+
+    file.close();
+    return job_types;
+
 }
 
 

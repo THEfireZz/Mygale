@@ -7,17 +7,19 @@
 
 #include <QLineEdit>
 #include <QFileDialog>
+#include <QXmlStreamReader>
 #include "JobCreationWidget.h++"
 
 class JobCreation {
 public:
-    explicit JobCreation(JobCreationWidget *job_creation_widget);
+    explicit JobCreation(JobCreationWidget *job_creation_widget, QString configFilePath);
 
     ~JobCreation() = default;
 
     void initialize();
 private:
     JobCreationWidget *job_creation_widget_;
+    QString config_file_path_;
 
     void connectSignalsAndSlots();
 
@@ -26,6 +28,8 @@ private:
     void openSceneFileDialog();
 
     void openOutputFolderDialog();
+
+    QStringList getJobTypesFromConfigFile(const QString &configFilePath);
 };
 
 
