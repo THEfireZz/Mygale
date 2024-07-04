@@ -136,22 +136,17 @@ QStringList JobCreation::getJobTypesFromConfigFile(const QString &configFilePath
 
 }
 
+/**
+ * @class JobCreation
+ * @brief This method reads the xml file and returns a list of formats for a given job type
+ *
+ * @param configFilePath the path to xml file containing the formats
+ * @param jobType the current job type
+ *
+ * @return a list of formats
+ **/
+
 QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath, const QString &jobType) {
-    /*		<Option>
-			<name>Maya_2020/Vray</name>
-			<skeleton>squeletteMaya_2020Vray.txt</skeleton>
-			<Format>Microsoft Windows Bitmap [*.bmp]</Format>
-			<Format>JPEG [*.jpg]</Format>
-			<Format>PNG [*.png]</Format>
-			<Format>Silicon Graphics [*.sgi]</Format>
-			<Format>Softimage [*.pic]</Format>
-			<Format>Targa [*.tga]</Format>
-			<Format>TIFF [*.tif]</Format>
-			<NameOption>-im </NameOption>
-			<FormatOption>-of </FormatOption>
-			<CameraOption>-cam </CameraOption>
-		</Option>
-     */
     QStringList formats;
     QFile file(configFilePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
