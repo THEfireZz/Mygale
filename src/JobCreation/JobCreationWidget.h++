@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QComboBox>
+#include <QToolButton>
 
 
 QT_BEGIN_NAMESPACE
@@ -56,41 +57,35 @@ public:
 
     [[nodiscard]] QCheckBox *getImagesFormatCheckBox();
 
-    //imagesFormatComboBox
     [[nodiscard]] QComboBox *getImagesFormatComboBox();
 
-    //cpuCheckBox
     [[nodiscard]] QCheckBox *getCpuCheckBox();
 
-    //minCpuLabel
     [[nodiscard]] QLabel *getMinCpuLabel();
 
-    //minCpuSpinBox
     [[nodiscard]] QSpinBox *getMinCpuSpinBox();
 
-    //maxCpuLabel
     [[nodiscard]] QLabel *getMaxCpuLabel();
 
-    //maxCpuSpinBox
     [[nodiscard]] QSpinBox *getMaxCpuSpinBox();
 
-    //memoryCheckBox
     [[nodiscard]] QCheckBox *getMemoryCheckBox();
 
-    //memoryLabel
     [[nodiscard]] QLabel *getMemoryLabel();
 
-    //memorySpinBox
     [[nodiscard]] QSpinBox *getMemorySpinBox();
 
-    //memorySuffixLabel
     [[nodiscard]] QLabel *getMemorySuffixLabel();
 
-    //analysisCheckBox
     [[nodiscard]] QCheckBox *getAnalysisCheckBox();
 
-    //resubmissionCheckBox
     [[nodiscard]] QCheckBox *getResubmissionCheckBox();
+
+    [[nodiscard]] QLineEdit *getJobNameLineEdit();
+
+    [[nodiscard]] QToolButton *getJobNameToolButton();
+
+
 
 
 private:

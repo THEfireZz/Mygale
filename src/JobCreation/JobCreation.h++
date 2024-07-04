@@ -5,7 +5,7 @@
 #ifndef MYGALE_JOBCREATION_H
 #define MYGALE_JOBCREATION_H
 
-
+#include <QLineEdit>
 #include "JobCreationWidget.h++"
 
 class JobCreation {
@@ -19,6 +19,8 @@ private:
     JobCreationWidget *job_creation_widget_;
 
     void connectSignalsAndSlots();
+
+    void incrementJobNumber();
 };
 
 

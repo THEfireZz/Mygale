@@ -153,6 +153,14 @@ QCheckBox *JobCreationWidget::getResubmissionCheckBox() {
     return ui->resubmissionCheckBox;
 }
 
+QLineEdit *JobCreationWidget::getJobNameLineEdit() {
+    return ui->jobNameLineEdit;
+}
+
+QToolButton *JobCreationWidget::getJobNameToolButton() {
+    return ui->jobNameToolButton;
+}
+
 /**
  * @class JobCreationWidget
  * @brief This method handles the toggling of the single image radio button
