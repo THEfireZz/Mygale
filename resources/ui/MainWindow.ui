@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::WindowModality::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,11 +16,17 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="tabShape">
+   <enum>QTabWidget::TabShape::Rounded</enum>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
-      <widget class="QWidget" name="mygaleTab">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="JobCreationWidget" name="jobCreationTab">
        <attribute name="title">
         <string>Mygale</string>
        </attribute>
@@ -32,6 +41,14 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>JobCreationWidget</class>
+   <extends>QWidget</extends>
+   <header>C:\Users\sd43247\CLionProjects\Mygale\src\JobCreation\JobCreationWidget.h++</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
