@@ -17,11 +17,6 @@ private:
     Job() = default;
 
 public:
-    void setJobName(const QString &jobName);
-
-    void setJobType(const QString &jobType);
-
-    void setJobParameters(const QHash<QString, QString> &jobParameters);
 
     [[nodiscard]] QString getJobName() const;
 
