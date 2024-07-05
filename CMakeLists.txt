@@ -21,7 +21,7 @@ set(SOURCES
         src/App/MainWindow.cpp
         src/JobCreation/JobCreationWidget.cpp
         src/JobCreation/JobCreation.cpp
-        src/JobCreation/JobCreation.h++
+        src/JobCreation/Job.cpp
 )
 
 #add the header files
@@ -29,6 +29,8 @@ set(HEADERS
         src/App/AppController.h++
         src/App/MainWindow.h++
         src/JobCreation/JobCreationWidget.h++
+        src/JobCreation/JobCreation.h++
+        src/JobCreation/Job.h++
 )
 
 #add the ui files

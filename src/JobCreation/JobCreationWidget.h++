@@ -12,6 +12,8 @@
 #include <QSpinBox>
 #include <QComboBox>
 #include <QToolButton>
+#include <QLineEdit>
+#include <QGroupBox>
 
 
 QT_BEGIN_NAMESPACE
@@ -95,6 +97,9 @@ public:
 
     [[nodiscard]] QComboBox *getJobTypeComboBox();
 
+    [[nodiscard]] QLineEdit *getCameraLineEdit();
+
+    [[nodiscard]] QGroupBox *getCameraGroupBox();
 
 
 
