@@ -181,6 +181,14 @@ QComboBox *JobCreationWidget::getJobTypeComboBox() {
     return ui->jobTypeComboBox;
 }
 
+QLineEdit *JobCreationWidget::getCameraLineEdit() {
+    return ui->cameraLineEdit;
+}
+
+QGroupBox *JobCreationWidget::getCameraGroupBox() {
+    return ui->cameraGroupBox;
+}
+
 /**
  * @class JobCreationWidget
  * @brief This method handles the toggling of the single image radio button

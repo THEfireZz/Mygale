@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QXmlStreamReader>
 #include "JobCreationWidget.h++"
+#include "Job.h++"
 
 class JobCreation {
 public:
@@ -17,9 +18,13 @@ public:
     ~JobCreation() = default;
 
     void initialize();
+
+    Job createJob();
+
 private:
     JobCreationWidget *job_creation_widget_;
     QString config_file_path_;
+    Job job_ = Job::Builder().build();
 
     void connectSignalsAndSlots();
 
@@ -32,6 +37,37 @@ private:
     static QStringList getJobTypesFromConfigFile(const QString &configFilePath);
 
     static QStringList getFormatsFromConfigFile(const QString &configFilePath, const QString &jobType);
+
+    [[nodiscard]] QString getJobType() const;
+
+    [[nodiscard]] QString getJobName() const;
+
+    [[nodiscard]] QString getScenePath() const;
+
+    [[nodiscard]] QString getOutputPath() const;
+
+    [[nodiscard]] QString getFormat() const;
+
+    [[nodiscard]] static QString getRawFormat(const QString& selection) ;
+
+    [[nodiscard]] static QString getFormatName(const QString& selection) ;
+
+    [[nodiscard]] QString getFirstImage() const;
+
+    [[nodiscard]] QString getLastImage() const;
+
+    [[nodiscard]] QString getFirstIndex() const;
+
+    [[nodiscard]] QString getLastIndex() const;
+
+    [[nodiscard]] QString getCameraName() const;
+
+    [[nodiscard]] QString getMinCpu() const;
+
+    [[nodiscard]] QString getMaxCpu() const;
+
+    [[nodiscard]] QString getMinMemory() const;
+
 };
 
 

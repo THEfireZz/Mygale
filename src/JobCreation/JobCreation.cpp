@@ -6,7 +6,8 @@
 
 #include "JobCreation.h++"
 
-JobCreation::JobCreation(JobCreationWidget *job_creation_widget, QString configFilePath) : job_creation_widget_(job_creation_widget), config_file_path_(std::move(configFilePath)){
+JobCreation::JobCreation(JobCreationWidget *job_creation_widget, QString configFilePath) : job_creation_widget_(
+        job_creation_widget), config_file_path_(std::move(configFilePath)) {
 }
 
 /**
@@ -20,7 +21,8 @@ void JobCreation::initialize() {
     QStringList job_types = getJobTypesFromConfigFile(config_file_path_);
     job_creation_widget_->getJobTypeComboBox()->addItems(job_types);
 
-    QStringList formats = getFormatsFromConfigFile(config_file_path_, job_creation_widget_->getJobTypeComboBox()->currentText());
+    QStringList formats = getFormatsFromConfigFile(config_file_path_,
+                                                   job_creation_widget_->getJobTypeComboBox()->currentText());
     job_creation_widget_->getImagesFormatComboBox()->addItems(formats);
 }
 
@@ -116,7 +118,7 @@ QStringList JobCreation::getJobTypesFromConfigFile(const QString &configFilePath
 
     QXmlStreamReader xmlReader(&file);
 
-    while(!xmlReader.atEnd() && !xmlReader.hasError()) {
+    while (!xmlReader.atEnd() && !xmlReader.hasError()) {
         xmlReader.readNext();
         if (!xmlReader.isStartElement() || xmlReader.name().toString() != "Option") {
             continue;
@@ -155,7 +157,7 @@ QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath,
 
     QXmlStreamReader xmlReader(&file);
 
-    while(!xmlReader.atEnd() && !xmlReader.hasError()) {
+    while (!xmlReader.atEnd() && !xmlReader.hasError()) {
         xmlReader.readNext();
         if (!xmlReader.isStartElement() || xmlReader.name().toString() != "Option") {
             continue;
@@ -178,4 +180,244 @@ QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath,
 
     file.close();
     return formats;
+}
+
+/**
+ * @class JobCreation
+ * @brief This method creates a job object with the parameters from the job creation widget
+ *
+ * @return a job object
+ **/
+Job JobCreation::createJob() {
+    QString job_name = getJobName();
+    QString job_type = getJobType();
+    QString scene_path = getScenePath();
+    QString output_path = getOutputPath();
+    QString format = getFormat();
+    QString first_image = getFirstImage();
+    QString last_image = getLastImage();
+    QString first_index = getFirstIndex();
+    QString last_index = getLastIndex();
+    QString camera_name = getCameraName();
+    QString min_cpu = getMinCpu();
+    QString max_cpu = getMaxCpu();
+    QString min_memory = getMinMemory();
+
+    job_ = Job::Builder()
+            .setJobName(job_name)
+            .setJobType(job_type)
+            .setJobParameters(QHash<QString, QString>{
+                    {"scene_path", scene_path},
+                    {"output_path", output_path},
+                    {"format", format},
+                    {"first_image", first_image},
+                    {"last_image", last_image},
+                    {"first_index", first_index},
+                    {"last_index", last_index},
+                    {"camera_name", camera_name},
+                    {"min_cpu", min_cpu},
+                    {"max_cpu", max_cpu},
+                    {"min_memory", min_memory}
+            })
+            .build();
+
+    return job_;
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the job type from the job creation widget
+ *
+ * @return the job type
+ **/
+
+QString JobCreation::getJobType() const {
+    return job_creation_widget_->getJobTypeComboBox()->currentText();
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the job name from the job creation widget
+ *
+ * @return the job name
+ **/
+
+QString JobCreation::getJobName() const {
+    return job_creation_widget_->getJobNameLineEdit()->text();
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the scene path from the job creation widget
+ *
+ * @return the scene path
+ **/
+
+QString JobCreation::getScenePath() const {
+    return job_creation_widget_->getSceneLineEdit()->text();
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the output path from the job creation widget
+ *
+ * @return the output path
+ **/
+
+QString JobCreation::getOutputPath() const {
+    return job_creation_widget_->getOutputLineEdit()->text();
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the format from the job creation widget depending on the job type
+ *
+ * @return the format
+ **/
+
+QString JobCreation::getFormat() const {
+    if (job_creation_widget_->getImagesFormatCheckBox()->isChecked()) {
+        QString selection = job_creation_widget_->getImagesFormatComboBox()->currentText();
+        QString result;
+        if (job_creation_widget_->getJobTypeComboBox()->currentText() != "Blender") {
+            result = getRawFormat(selection);
+        } else {
+            result = getFormatName(selection);
+        }
+        return result;
+    }
+    return {};
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the raw format from the current format selected
+ *
+ * @param selection the current format selected
+ *
+ * @return the raw format
+ **/
+
+QString JobCreation::getRawFormat(const QString &selection) {
+    static QRegularExpression regex(R"(\[\*\.(\w+)\])");
+    if (auto match = regex.match(selection); match.hasMatch()) {
+        return match.captured(1);
+    }
+    return {};
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the format name from the current format selected
+ *
+ * @param selection the current format selected
+ *
+ * @return the format name
+ **/
+QString JobCreation::getFormatName(const QString &selection) {
+    static QRegularExpression regex(R"(\b(.*?)\s*\[\*\.)");
+    if (auto match = regex.match(selection); match.hasMatch()) {
+        return match.captured(1);
+    }
+    return {};
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the first image from the job creation widget
+ **/
+
+QString JobCreation::getFirstImage() const {
+    if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
+        return job_creation_widget_->getSingleImageSpinBox()->text();
+    }
+    return job_creation_widget_->getFirstImageSpinBox()->text();
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the last image from the job creation widget
+ **/
+QString JobCreation::getLastImage() const {
+    if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
+        return job_creation_widget_->getSingleImageSpinBox()->text();
+    }
+    return job_creation_widget_->getLastImageSpinBox()->text();
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the first index (calculated from the first image) from the job creation widget
+ **/
+QString JobCreation::getFirstIndex() const {
+    if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
+        return job_creation_widget_->getSingleImageSpinBox()->text();
+    } else if (job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
+        return "1";
+    }
+    return job_creation_widget_->getFirstImageSpinBox()->text();
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the last index (calculated from the last image and the number of batch images) from the job creation widget
+ **/
+QString JobCreation::getLastIndex() const {
+    if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
+        return job_creation_widget_->getSingleImageSpinBox()->text();
+    } else if (job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
+        if (job_creation_widget_->getBatchCalculationSpinBox()->value() == 0) {
+            throw std::invalid_argument("Batch calculation value cannot be 0");
+        }
+        int last_index = job_creation_widget_->getLastImageSpinBox()->value() -
+                         job_creation_widget_->getFirstImageSpinBox()->value() /
+                         job_creation_widget_->getBatchCalculationSpinBox()->value();
+        return QString::number(last_index);
+    }
+    return job_creation_widget_->getLastImageSpinBox()->text();
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the camera name from the job creation widget
+ **/
+QString JobCreation::getCameraName() const {
+    if (job_creation_widget_->getCameraGroupBox()->isChecked()){
+        return job_creation_widget_->getCameraLineEdit()->text();
+    }
+    return {};
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the minimum cpu from the job creation widget
+ **/
+
+QString JobCreation::getMinCpu() const {
+    if (job_creation_widget_->getCpuCheckBox()->isChecked()){
+        return job_creation_widget_->getMinCpuSpinBox()->text();
+    }
+    return {};
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the maximum cpu from the job creation widget if the cpu checkbox is not checked, it returns the default value (32)
+ **/
+QString JobCreation::getMaxCpu() const {
+    if (job_creation_widget_->getCpuCheckBox()->isChecked()){
+        return job_creation_widget_->getMaxCpuSpinBox()->text();
+    }
+    return {"32"};
+}
+
+/**
+ * @class JobCreation
+ * @brief This method returns the minimum memory from the job creation widget
+ **/
+QString JobCreation::getMinMemory() const {
+    if (job_creation_widget_->getMemoryCheckBox()->isChecked()){
+        return job_creation_widget_->getMemorySpinBox()->text();
+    }
+    return {};
 }
