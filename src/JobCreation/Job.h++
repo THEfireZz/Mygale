@@ -41,7 +41,7 @@ public:
 
         Builder &setJobParameters(const QHash<QString, QString> &jobParameters);
 
-        Job build();
+        Job build() const;
     };
 
 };

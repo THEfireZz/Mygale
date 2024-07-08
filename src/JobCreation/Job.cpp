@@ -4,36 +4,6 @@
 
 #include "Job.h++"
 
-/**
- * @class Job
- * @brief This method sets the job name
- *
- * @param jobName The name of the job
- **/
-void Job::setJobName(const QString &jobName) {
-    job_name_ = jobName;
-}
-
-/**
- * @class Job
- * @brief This method sets the job type
- *
- * @param jobType The type of the job
- **/
-void Job::setJobType(const QString &jobType) {
-    job_type_ = jobType;
-}
-
-/**
- * @class Job
- * @brief This method sets the job parameters
- *
- * @param jobParameters The list of parameters of the job with their keys and values
- **/
-void Job::setJobParameters(const QHash<QString, QString> &jobParameters) {
-    job_parameters_ = jobParameters;
-}
-
 QString Job::getJobName() const {
     return job_name_;
 }
@@ -84,10 +54,10 @@ Job::Builder &Job::Builder::addJobParameter(const QString &key, const QString &v
  *
  * @return The job object
  **/
-Job Job::Builder::build() {
+Job Job::Builder::build() const {
     Job job;
-    job.setJobName(job_name_);
-    job.setJobType(job_type_);
+    job.job_name_ = job_name_;
+    job.job_type_ = job_type_;
     job.job_parameters_ = job_parameters_;
     return job;
 }
