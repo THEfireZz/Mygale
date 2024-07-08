@@ -40,6 +40,51 @@ void BaseScript::copyRemoteScript() const {
 
 }
 
+void BaseScript::replaceScriptParameters() const {
+    // Open the script file
+    QFile script_file(local_job_location_ + job_.getJobName() + ".bat");
+    if (!script_file.open(QIODevice::ReadWrite | QIODevice::Text)) {
+        // throw exception
+        throw std::runtime_error("Could not open the script file");
+    }
+
+    // Read the script file
+    QTextStream script_stream(&script_file);
+    QString script = script_stream.readAll();
+
+    // Replace the parameters in the script
+    const auto &jobParameters = job_.getJobParameters();
+    for (auto it = jobParameters.cbegin(); it != jobParameters.cend(); ++it) {
+        script.replace(it.key(), it.value());
+    }
+
+    // Write the script file
+    script_file.resize(0);
+    script_stream << script;
+    script_file.close();
+
+    // Open the launchers file
+    QFile launchers_file(local_job_location_ + "lance.bat");
+    if (!launchers_file.open(QIODevice::ReadWrite | QIODevice::Text)) {
+        // throw exception
+        throw std::runtime_error("Could not open the launchers file");
+    }
+
+    // Read the launchers file
+    QTextStream launchers_stream(&launchers_file);
+    QString launchers = launchers_stream.readAll();
+
+    for (auto it = jobParameters.cbegin(); it != jobParameters.cend(); ++it) {
+        launchers.replace(it.key(), it.value());
+    }
+
+    // Write the launchers file
+    launchers_file.resize(0);
+    launchers_stream << launchers;
+    launchers_file.close();
+}
+
+
 
 
 

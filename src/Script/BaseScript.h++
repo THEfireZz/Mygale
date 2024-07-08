@@ -14,6 +14,8 @@ public:
 
     void initialize();
 
+    void replaceScriptParameters() const;
+
 private:
     Job job_;
     QString remote_script_path_;

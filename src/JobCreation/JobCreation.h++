@@ -69,8 +69,15 @@ private:
 
     [[nodiscard]] QString getMaxCpu() const;
 
-    [[nodiscard]] QString getMinMemory() const;
+    [[nodiscard]] QString getSubmissionOption() const;
 
+    QString getName();
+
+    QString getCpuInterval() const;
+
+    QString getMemoryInterval() const;
+
+    QString getParcStyleList() const;
 };
 
 

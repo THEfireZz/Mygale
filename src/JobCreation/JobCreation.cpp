@@ -194,9 +194,11 @@ QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath,
  **/
 Job JobCreation::createJob(QString priority) {
     QString job_name = getJobName();
+    QString path = "I:\\";
     QString job_type = getJobType();
     QString scene_path = getScenePath();
     QString output_path = getOutputPath();
+    QString name = getName();
     QString format = getFormat();
     QString first_image = getFirstImage();
     QString last_image = getLastImage();
@@ -205,24 +207,27 @@ Job JobCreation::createJob(QString priority) {
     QString camera_name = getCameraName();
     QString min_cpu = getMinCpu();
     QString max_cpu = getMaxCpu();
-    QString min_memory = getMinMemory();
+    QString submission_option = getSubmissionOption();
 
     job_ = Job::Builder()
             .setJobName(job_name)
             .setJobType(job_type)
             .setJobParameters(QHash<QString, QString>{
-                    {"scene_path", scene_path},
-                    {"output_path", output_path},
-                    {"format", format},
-                    {"first_image", first_image},
-                    {"last_image", last_image},
-                    {"first_index", first_index},
-                    {"last_index", last_index},
-                    {"camera_name", camera_name},
-                    {"min_cpu", min_cpu},
-                    {"max_cpu", max_cpu},
-                    {"min_memory", min_memory},
-                    {"priority", priority}
+                    {"<jobName>",    job_name},
+                    {"<path>",       path},
+                    {"<scene>",      scene_path},
+                    {"<output>",     output_path},
+                    {"<name>",       name},
+                    {"<format>",     format},
+                    {"<firstImg>",   first_image},
+                    {"<lastImg>",    last_image},
+                    {"<firstIndex>", first_index},
+                    {"<lastIndex>",  last_index},
+                    {"<camera>",     camera_name},
+                    {"<minCPU>",     min_cpu},
+                    {"<maxCPU>",     max_cpu},
+                    {"<submissionOption>", submission_option},
+                    {"<priority>",   priority}
             })
             .build();
 
@@ -275,12 +280,26 @@ QString JobCreation::getOutputPath() const {
 
 /**
  * @class JobCreation
+ * @brief This method returns the name from the job creation widget
+ **/
+
+QString JobCreation::getName() {
+    if (job_creation_widget_->getImagesNameCheckBox()->isChecked()) {
+        return job_creation_widget_->getJobNameLineEdit()->text();
+    }
+    return {};
+
+}
+
+/**
+ * @class JobCreation
  * @brief This method returns the format from the job creation widget depending on the job type
  *
  * @return the format
  **/
 
 QString JobCreation::getFormat() const {
+    //TODO : Add the format prefix
     if (job_creation_widget_->getImagesFormatCheckBox()->isChecked()) {
         QString selection = job_creation_widget_->getImagesFormatComboBox()->currentText();
         QString result;
@@ -387,7 +406,7 @@ QString JobCreation::getLastIndex() const {
  * @brief This method returns the camera name from the job creation widget
  **/
 QString JobCreation::getCameraName() const {
-    if (job_creation_widget_->getCameraGroupBox()->isChecked()){
+    if (job_creation_widget_->getCameraGroupBox()->isChecked()) {
         return job_creation_widget_->getCameraLineEdit()->text();
     }
     return {};
@@ -399,7 +418,7 @@ QString JobCreation::getCameraName() const {
  **/
 
 QString JobCreation::getMinCpu() const {
-    if (job_creation_widget_->getCpuCheckBox()->isChecked()){
+    if (job_creation_widget_->getCpuCheckBox()->isChecked()) {
         return job_creation_widget_->getMinCpuSpinBox()->text();
     }
     return {};
@@ -410,7 +429,7 @@ QString JobCreation::getMinCpu() const {
  * @brief This method returns the maximum cpu from the job creation widget if the cpu checkbox is not checked, it returns the default value (32)
  **/
 QString JobCreation::getMaxCpu() const {
-    if (job_creation_widget_->getCpuCheckBox()->isChecked()){
+    if (job_creation_widget_->getCpuCheckBox()->isChecked()) {
         return job_creation_widget_->getMaxCpuSpinBox()->text();
     }
     return {"32"};
@@ -418,13 +437,58 @@ QString JobCreation::getMaxCpu() const {
 
 /**
  * @class JobCreation
- * @brief This method returns the minimum memory from the job creation widget
  **/
-QString JobCreation::getMinMemory() const {
-    if (job_creation_widget_->getMemoryCheckBox()->isChecked()){
-        return job_creation_widget_->getMemorySpinBox()->text();
+QString JobCreation::getSubmissionOption() const {
+    QString cpuInterval = getCpuInterval();
+    QString memoryInterval = getMemoryInterval();
+    QString parcStyleList = getParcStyleList();
+
+    QStringList submissionOptions;
+
+    if(!cpuInterval.isEmpty()) {
+        submissionOptions.append(cpuInterval);
+    }
+    if(!memoryInterval.isEmpty()) {
+        submissionOptions.append(memoryInterval);
+    }
+    if(!parcStyleList.isEmpty()) {
+        submissionOptions.append(parcStyleList);
+    } else {
+        throw std::invalid_argument("No parc style selected");
+    }
+
+    return submissionOptions.join(" && ");
+}
+
+QString JobCreation::getCpuInterval() const {
+    if (job_creation_widget_->getCpuCheckBox()->isChecked()) {
+        QString minCpu = getMinCpu();
+        QString maxCpu = getMaxCpu();
+        return QString("ncpus >= %1 && ncpus <= %2").arg(minCpu, maxCpu);
     }
     return {};
+}
+
+QString JobCreation::getMemoryInterval() const {
+    if (job_creation_widget_->getMemoryCheckBox()->isChecked()) {
+        double memory = job_creation_widget_->getMemorySpinBox()->value() * 1024;
+        return QString("mem > %1").arg(memory);
+    }
+    return {};
+}
+
+QString JobCreation::getParcStyleList() const {
+    QStringList parcStyleList;
+
+    //for each checked parc style in the pcPoolManagementGridLayout add "parc_style == <parcStyle>"
+    for (int i = 0; i < job_creation_widget_->getPcPoolManagementGridLayout()->count(); ++i) {
+        QCheckBox *checkBox = qobject_cast<QCheckBox *>(job_creation_widget_->getPcPoolManagementGridLayout()->itemAt(i)->widget());
+        if (checkBox->isChecked()) {
+            parcStyleList.append(QString("parc_style == %1").arg(checkBox->property("LSF").toString()));
+        }
+    }
+
+    return parcStyleList.isEmpty() ? QString() :parcStyleList.size() == 1 ? parcStyleList.first() : "(" + parcStyleList.join(" || ") + ")";
 }
 
 void JobCreation::createAndExecuteJob(QString priority) {
@@ -432,34 +496,34 @@ void JobCreation::createAndExecuteJob(QString priority) {
     qDebug() << "Job created : " << job_.getJobName();
 
     QString remote_script_path;
-    if(job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender"){
-        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()){
-            remote_script_path = R"(I:\Mygale\Config\skeleton\Blender\Skeleton_Blender.txt)";
+    if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender") {
+        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Blender\Skeleton_Blender.txt)";
         } else {
-            remote_script_path = R"(I:\Mygale\Config\skeleton\Blender\Skeleton_Blender_MultipleImage.txt)";
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Blender\Skeleton_Blender_MultipleImage.txt)";
         }
-    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray"){
-        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()){
-            remote_script_path = R"(I:\Mygale\Config\skeleton\Maya\Skeleton_Maya_2020_Vray.txt)";
+    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray") {
+        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2020_Vray.txt)";
         } else {
-            remote_script_path = R"(I:\Mygale\Config\skeleton\Maya\Skeleton_Maya_2020_Vray_MultipleImage.txt)";
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2020_Vray_MultipleImage.txt)";
         }
-    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray"){
-        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()){
-            remote_script_path = R"(I:\Mygale\Config\skeleton\Maya\Skeleton_Maya_2023_Vray.txt)";
+    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
+        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2023_Vray.txt)";
         } else {
-            remote_script_path = R"(I:\Mygale\Config\skeleton\Maya\Skeleton_Maya_2023_Vray_MultipleImage.txt)";
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2023_Vray_MultipleImage.txt)";
         }
-    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred"){
-        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()){
-            remote_script_path = R"(I:\Mygale\Config\skeleton\Vred\Skeleton_Vred.txt)";
+    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred") {
+        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Vred\Skeleton_Vred.txt)";
         } else {
-            remote_script_path = R"(I:\Mygale\Config\skeleton\Vred\Skeleton_Vred_MultipleImage.txt)";
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Vred\Skeleton_Vred_MultipleImage.txt)";
         }
     }
     qDebug() << "Remote script path : " << remote_script_path;
 
-    QString remote_launchers_path = R"(I:\Mygale\Config\lance.txt)";
+    QString remote_launchers_path = R"(I:\Mygale\Config_Blender_4_V2\lance.txt)";
     qDebug() << "Remote launchers path : " << remote_launchers_path;
 
     QString local_job_location = R"(I:\Mygale\TEMP\)" + job_.getJobName() + R"(\)";
@@ -467,4 +531,5 @@ void JobCreation::createAndExecuteJob(QString priority) {
 
     BaseScript script(job_, remote_script_path, remote_launchers_path, local_job_location);
     script.initialize();
+    script.replaceScriptParameters();
 }

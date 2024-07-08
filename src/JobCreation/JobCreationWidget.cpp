@@ -4,6 +4,7 @@
 
 // You may need to build the project (run Qt uic code generator) to get "ui_MygaleWidget.h" resolved
 
+#include <QGridLayout>
 #include "JobCreationWidget.h++"
 #include "../../resources/ui/ui_JobCreationWidget.h"
 
@@ -191,6 +192,10 @@ QGroupBox *JobCreationWidget::getCameraGroupBox() {
 
 QPushButton *JobCreationWidget::getExecutionPushButton() {
     return ui->executionPushButton;
+}
+
+QGridLayout *JobCreationWidget::getPcPoolManagementGridLayout() {
+    return ui->pcPoolManagementGridLayout;
 }
 
 /**

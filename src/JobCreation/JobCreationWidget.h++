@@ -104,6 +104,8 @@ public:
 
     [[nodiscard]] QPushButton *getExecutionPushButton();
 
+    [[nodiscard]] QGridLayout *getPcPoolManagementGridLayout();
+
 
 
 
