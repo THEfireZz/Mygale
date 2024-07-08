@@ -189,6 +189,10 @@ QGroupBox *JobCreationWidget::getCameraGroupBox() {
     return ui->cameraGroupBox;
 }
 
+QPushButton *JobCreationWidget::getExecutionPushButton() {
+    return ui->executionPushButton;
+}
+
 /**
  * @class JobCreationWidget
  * @brief This method handles the toggling of the single image radio button

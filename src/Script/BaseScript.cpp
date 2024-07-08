@@ -4,6 +4,7 @@
 
 #include <utility>
 #include <qfile.h>
+#include <qdir.h>
 
 #include "BaseScript.h++"
 
@@ -18,6 +19,11 @@ void BaseScript::initialize() {
 }
 
 void BaseScript::copyRemoteScript() const {
+    // Create the local job location folder if it does not exist
+    if (QDir local_job_location(local_job_location_); !local_job_location.exists()) {
+        local_job_location.mkpath(".");
+    }
+
     // Copy the remote script to the local job location
     QFile remote_script(remote_script_path_);
     if (!remote_script.copy(local_job_location_ + job_.getJobName() + ".bat")) {

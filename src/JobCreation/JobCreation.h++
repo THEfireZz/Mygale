@@ -10,6 +10,7 @@
 #include <QXmlStreamReader>
 #include "JobCreationWidget.h++"
 #include "Job.h++"
+#include "../Script/BaseScript.h++"
 
 class JobCreation {
 public:
@@ -19,7 +20,9 @@ public:
 
     void initialize();
 
-    Job createJob();
+    Job createJob(QString priority);
+
+    void createAndExecuteJob(QString priority);
 
 private:
     JobCreationWidget *job_creation_widget_;

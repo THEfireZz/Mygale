@@ -14,6 +14,7 @@
 #include <QToolButton>
 #include <QLineEdit>
 #include <QGroupBox>
+#include <QPushButton>
 
 
 QT_BEGIN_NAMESPACE
@@ -100,6 +101,8 @@ public:
     [[nodiscard]] QLineEdit *getCameraLineEdit();
 
     [[nodiscard]] QGroupBox *getCameraGroupBox();
+
+    [[nodiscard]] QPushButton *getExecutionPushButton();
 
 
 

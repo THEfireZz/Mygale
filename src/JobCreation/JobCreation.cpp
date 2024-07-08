@@ -38,6 +38,10 @@ void JobCreation::connectSignalsAndSlots() {
     QAbstractButton::connect(job_creation_widget_->getOutputToolButton(), &QAbstractButton::clicked, [this] {
         openOutputFolderDialog();
     });
+
+    QAbstractButton::connect(job_creation_widget_->getExecutionPushButton(), &QAbstractButton::clicked, [this] {
+        createAndExecuteJob("50");
+    });
 }
 
 /**
@@ -188,7 +192,7 @@ QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath,
  *
  * @return a job object
  **/
-Job JobCreation::createJob() {
+Job JobCreation::createJob(QString priority) {
     QString job_name = getJobName();
     QString job_type = getJobType();
     QString scene_path = getScenePath();
@@ -217,7 +221,8 @@ Job JobCreation::createJob() {
                     {"camera_name", camera_name},
                     {"min_cpu", min_cpu},
                     {"max_cpu", max_cpu},
-                    {"min_memory", min_memory}
+                    {"min_memory", min_memory},
+                    {"priority", priority}
             })
             .build();
 
@@ -420,4 +425,46 @@ QString JobCreation::getMinMemory() const {
         return job_creation_widget_->getMemorySpinBox()->text();
     }
     return {};
+}
+
+void JobCreation::createAndExecuteJob(QString priority) {
+    createJob(std::move(priority));
+    qDebug() << "Job created : " << job_.getJobName();
+
+    QString remote_script_path;
+    if(job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender"){
+        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()){
+            remote_script_path = R"(I:\Mygale\Config\skeleton\Blender\Skeleton_Blender.txt)";
+        } else {
+            remote_script_path = R"(I:\Mygale\Config\skeleton\Blender\Skeleton_Blender_MultipleImage.txt)";
+        }
+    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray"){
+        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()){
+            remote_script_path = R"(I:\Mygale\Config\skeleton\Maya\Skeleton_Maya_2020_Vray.txt)";
+        } else {
+            remote_script_path = R"(I:\Mygale\Config\skeleton\Maya\Skeleton_Maya_2020_Vray_MultipleImage.txt)";
+        }
+    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray"){
+        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()){
+            remote_script_path = R"(I:\Mygale\Config\skeleton\Maya\Skeleton_Maya_2023_Vray.txt)";
+        } else {
+            remote_script_path = R"(I:\Mygale\Config\skeleton\Maya\Skeleton_Maya_2023_Vray_MultipleImage.txt)";
+        }
+    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred"){
+        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()){
+            remote_script_path = R"(I:\Mygale\Config\skeleton\Vred\Skeleton_Vred.txt)";
+        } else {
+            remote_script_path = R"(I:\Mygale\Config\skeleton\Vred\Skeleton_Vred_MultipleImage.txt)";
+        }
+    }
+    qDebug() << "Remote script path : " << remote_script_path;
+
+    QString remote_launchers_path = R"(I:\Mygale\Config\lance.txt)";
+    qDebug() << "Remote launchers path : " << remote_launchers_path;
+
+    QString local_job_location = R"(I:\Mygale\TEMP\)" + job_.getJobName() + R"(\)";
+    qDebug() << "Local job location : " << local_job_location;
+
+    BaseScript script(job_, remote_script_path, remote_launchers_path, local_job_location);
+    script.initialize();
 }
