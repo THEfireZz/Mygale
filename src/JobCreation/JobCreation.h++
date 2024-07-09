@@ -78,6 +78,8 @@ private:
     QString getMemoryInterval() const;
 
     QString getParcStyleList() const;
+
+    QString getSteps();
 };
 
 

@@ -208,6 +208,7 @@ Job JobCreation::createJob(QString priority) {
     QString min_cpu = getMinCpu();
     QString max_cpu = getMaxCpu();
     QString submission_option = getSubmissionOption();
+    QString steps = getSteps();
 
     job_ = Job::Builder()
             .setJobName(job_name)
@@ -227,6 +228,7 @@ Job JobCreation::createJob(QString priority) {
                     {"<minCPU>",           min_cpu},
                     {"<maxCPU>",           max_cpu},
                     {"<submissionOption>", submission_option},
+                    {"<steps>",            steps},
                     {"<priority>",         priority}
             })
             .build();
@@ -482,7 +484,7 @@ QString JobCreation::getParcStyleList() const {
 
     //for each checked parc style in the pcPoolManagementGridLayout add "parc_style == <parcStyle>"
     for (int i = 0; i < job_creation_widget_->getPcPoolManagementGridLayout()->count(); ++i) {
-        QCheckBox *checkBox = qobject_cast<QCheckBox *>(
+        auto *checkBox = qobject_cast<QCheckBox *>(
                 job_creation_widget_->getPcPoolManagementGridLayout()->itemAt(i)->widget());
         if (checkBox->isChecked()) {
             parcStyleList.append(QString("parc_style == %1").arg(checkBox->property("LSF").toString()));
@@ -493,6 +495,13 @@ QString JobCreation::getParcStyleList() const {
                                                                                                      parcStyleList.join(
                                                                                                              " || ") +
                                                                                                      ")";
+}
+
+QString JobCreation::getSteps() {
+    if (job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
+        return QString::number(job_creation_widget_->getBatchCalculationSpinBox()->value());
+    }
+    return {};
 }
 
 void JobCreation::createAndExecuteJob(QString priority) {
@@ -537,3 +546,5 @@ void JobCreation::createAndExecuteJob(QString priority) {
     script.initialize();
     script.replaceScriptParameters();
 }
+
+
