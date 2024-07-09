@@ -133,6 +133,7 @@ private:
     void analysisCheckBoxToggled(bool checked);
 
 
+    void loadPcPoolManagmentChoice();
 };
 
 
