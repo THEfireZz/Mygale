@@ -517,21 +517,21 @@ void JobCreation::createAndExecuteJob(QString priority) {
         }
     } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray") {
         if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2020_Vray.txt)";
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2020Vray.txt)";
         } else {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2020_Vray_MultipleImage.txt)";
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2020Vray_MultipleImage.txt)";
         }
     } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
         if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2023_Vray.txt)";
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2023Vray.txt)";
         } else {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2023_Vray_MultipleImage.txt)";
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2023Vray_MultipleImage.txt)";
         }
     } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred") {
         if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
             remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Vred\Skeleton_Vred.txt)";
         } else {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Vred\Skeleton_Vred_MultipleImage.txt)";
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Vred\Skeleton_Vred_Ressubmission.txt)";
         }
     }
     qDebug() << "Remote script path : " << remote_script_path;
