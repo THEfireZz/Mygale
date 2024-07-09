@@ -484,17 +484,19 @@ QString JobCreation::getParcStyleList() const {
 
     //for each checked parc style in the pcPoolManagementGridLayout add "parc_style == <parcStyle>"
     for (int i = 0; i < job_creation_widget_->getPcPoolManagementGridLayout()->count(); ++i) {
-        auto *checkBox = qobject_cast<QCheckBox *>(
+        QCheckBox const *checkBox;
+        checkBox = qobject_cast<QCheckBox *>(
                 job_creation_widget_->getPcPoolManagementGridLayout()->itemAt(i)->widget());
         if (checkBox->isChecked()) {
             parcStyleList.append(QString("parc_style == %1").arg(checkBox->property("LSF").toString()));
         }
     }
 
-    return parcStyleList.isEmpty() ? QString() : parcStyleList.size() == 1 ? parcStyleList.first() : "(" +
-                                                                                                     parcStyleList.join(
-                                                                                                             " || ") +
-                                                                                                     ")";
+    if (parcStyleList.size() == 1) {
+        return parcStyleList.isEmpty() ? QString() : parcStyleList.first();
+    } else {
+        return parcStyleList.isEmpty() ? QString() : "(" + parcStyleList.join(" || ") + ")";
+    }
 }
 
 QString JobCreation::getSteps() {
@@ -539,9 +541,29 @@ void JobCreation::createAndExecuteJob(QString priority) {
 
     QString local_job_location = R"(I:\Mygale\TEMP\)" + job_.getJobName() + R"(\)";
 
+    qDebug() << "Remote script path : " << remote_script_path << " Remote launchers path : " << remote_launchers_path
+             << " Local job location : " << local_job_location;
     BaseScript script(job_, remote_script_path, remote_launchers_path, local_job_location);
-    script.initialize();
-    script.replaceScriptParameters();
+    script.copyRemoteScript(job_.getJobName() + ".bat", "lance.bat");
+    script.replaceScriptParameters(job_.getJobName() + ".bat", "lance.bat");
+
+    //TODO : execute the job
+
+    if (job_creation_widget_->getAnalysisCheckBox()->isChecked()) {
+        remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Skeleton_Analysis.txt)";
+        remote_launchers_path = R"(I:\Mygale\Config_Blender_4_V2\lanceAnalysis.txt)";
+        local_job_location = R"(I:\Mygale\TEMP\)" + job_.getJobName() + R"(\)";
+
+        job_.setJobName(job_.getJobName() + "_Analysis");
+        job_.addJobParameter("<jobName>", job_.getJobName());
+
+        qDebug() << "Remote script path : " << remote_script_path << " Remote launchers path : " << remote_launchers_path
+                 << " Local job location : " << local_job_location;
+
+        BaseScript analysis_script(job_, remote_script_path, remote_launchers_path, local_job_location);
+        analysis_script.copyRemoteScript(job_.getJobName() + ".bat", "lanceAnalysis.bat");
+        analysis_script.replaceScriptParameters(job_.getJobName() + ".bat", "lanceAnalysis.bat");
+    }
 }
 
 

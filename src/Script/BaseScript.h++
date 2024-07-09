@@ -12,17 +12,16 @@ class BaseScript {
 public:
     explicit BaseScript(Job job,QString remoteScriptPath, QString remoteLaunchersPath, QString localJobLocation);
 
-    void initialize();
+    void replaceScriptParameters(QString scriptName, QString launcherName) const ;
 
-    void replaceScriptParameters() const;
+    virtual void copyRemoteScript(QString scriptName, QString launcherName) const;
 
-private:
+protected:
     Job job_;
     QString remote_script_path_;
     QString remote_launchers_path_;
     QString local_job_location_;
 
-    void copyRemoteScript() const;
 };
 
 

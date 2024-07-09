@@ -23,7 +23,6 @@ set(SOURCES
         src/JobCreation/JobCreation.cpp
         src/JobCreation/Job.cpp
         src/Script/BaseScript.cpp
-        src/Script/BaseScript.h++
 )
 
 #add the header files
@@ -33,6 +32,7 @@ set(HEADERS
         src/JobCreation/JobCreationWidget.h++
         src/JobCreation/JobCreation.h++
         src/JobCreation/Job.h++
+        src/Script/BaseScript.h++
 )
 
 #add the ui files
