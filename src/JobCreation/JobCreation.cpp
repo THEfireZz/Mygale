@@ -534,13 +534,10 @@ void JobCreation::createAndExecuteJob(QString priority) {
             remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Vred\Skeleton_Vred_Ressubmission.txt)";
         }
     }
-    qDebug() << "Remote script path : " << remote_script_path;
 
     QString remote_launchers_path = R"(I:\Mygale\Config_Blender_4_V2\lance.txt)";
-    qDebug() << "Remote launchers path : " << remote_launchers_path;
 
     QString local_job_location = R"(I:\Mygale\TEMP\)" + job_.getJobName() + R"(\)";
-    qDebug() << "Local job location : " << local_job_location;
 
     BaseScript script(job_, remote_script_path, remote_launchers_path, local_job_location);
     script.initialize();
