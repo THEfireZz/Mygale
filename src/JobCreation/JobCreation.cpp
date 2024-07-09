@@ -213,21 +213,21 @@ Job JobCreation::createJob(QString priority) {
             .setJobName(job_name)
             .setJobType(job_type)
             .setJobParameters(QHash<QString, QString>{
-                    {"<jobName>",    job_name},
-                    {"<path>",       path},
-                    {"<scene>",      scene_path},
-                    {"<output>",     output_path},
-                    {"<name>",       name},
-                    {"<format>",     format},
-                    {"<firstImg>",   first_image},
-                    {"<lastImg>",    last_image},
-                    {"<firstIndex>", first_index},
-                    {"<lastIndex>",  last_index},
-                    {"<camera>",     camera_name},
-                    {"<minCPU>",     min_cpu},
-                    {"<maxCPU>",     max_cpu},
+                    {"<jobName>",          job_name},
+                    {"<path>",             path},
+                    {"<scene>",            scene_path},
+                    {"<output>",           output_path},
+                    {"<name>",             name},
+                    {"<format>",           format},
+                    {"<firstImg>",         first_image},
+                    {"<lastImg>",          last_image},
+                    {"<firstIndex>",       first_index},
+                    {"<lastIndex>",        last_index},
+                    {"<camera>",           camera_name},
+                    {"<minCPU>",           min_cpu},
+                    {"<maxCPU>",           max_cpu},
                     {"<submissionOption>", submission_option},
-                    {"<priority>",   priority}
+                    {"<priority>",         priority}
             })
             .build();
 
@@ -393,8 +393,8 @@ QString JobCreation::getLastIndex() const {
         if (job_creation_widget_->getBatchCalculationSpinBox()->value() == 0) {
             throw std::invalid_argument("Batch calculation value cannot be 0");
         }
-        int last_index = job_creation_widget_->getLastImageSpinBox()->value() -
-                         job_creation_widget_->getFirstImageSpinBox()->value() /
+        int last_index = (job_creation_widget_->getLastImageSpinBox()->value() -
+                          job_creation_widget_->getFirstImageSpinBox()->value()) /
                          job_creation_widget_->getBatchCalculationSpinBox()->value();
         return QString::number(last_index);
     }
@@ -445,16 +445,16 @@ QString JobCreation::getSubmissionOption() const {
 
     QStringList submissionOptions;
 
-    if(!cpuInterval.isEmpty()) {
+    if (!cpuInterval.isEmpty()) {
         submissionOptions.append(cpuInterval);
     }
-    if(!memoryInterval.isEmpty()) {
+    if (!memoryInterval.isEmpty()) {
         submissionOptions.append(memoryInterval);
     }
-    if(!parcStyleList.isEmpty()) {
+    if (!parcStyleList.isEmpty()) {
         submissionOptions.append(parcStyleList);
     } else {
-        throw std::invalid_argument("No parc style selected");
+        //throw std::invalid_argument("No parc style selected");
     }
 
     return submissionOptions.join(" && ");
@@ -482,13 +482,17 @@ QString JobCreation::getParcStyleList() const {
 
     //for each checked parc style in the pcPoolManagementGridLayout add "parc_style == <parcStyle>"
     for (int i = 0; i < job_creation_widget_->getPcPoolManagementGridLayout()->count(); ++i) {
-        QCheckBox *checkBox = qobject_cast<QCheckBox *>(job_creation_widget_->getPcPoolManagementGridLayout()->itemAt(i)->widget());
+        QCheckBox *checkBox = qobject_cast<QCheckBox *>(
+                job_creation_widget_->getPcPoolManagementGridLayout()->itemAt(i)->widget());
         if (checkBox->isChecked()) {
             parcStyleList.append(QString("parc_style == %1").arg(checkBox->property("LSF").toString()));
         }
     }
 
-    return parcStyleList.isEmpty() ? QString() :parcStyleList.size() == 1 ? parcStyleList.first() : "(" + parcStyleList.join(" || ") + ")";
+    return parcStyleList.isEmpty() ? QString() : parcStyleList.size() == 1 ? parcStyleList.first() : "(" +
+                                                                                                     parcStyleList.join(
+                                                                                                             " || ") +
+                                                                                                     ")";
 }
 
 void JobCreation::createAndExecuteJob(QString priority) {

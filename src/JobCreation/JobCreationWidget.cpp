@@ -194,7 +194,7 @@ QPushButton *JobCreationWidget::getExecutionPushButton() {
     return ui->executionPushButton;
 }
 
-QGridLayout *JobCreationWidget::getPcPoolManagementGridLayout() {
+QGridLayout * JobCreationWidget::getPcPoolManagementGridLayout() {
     return ui->pcPoolManagementGridLayout;
 }
 

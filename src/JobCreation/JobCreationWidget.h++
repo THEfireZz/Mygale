@@ -15,6 +15,7 @@
 #include <QLineEdit>
 #include <QGroupBox>
 #include <QPushButton>
+#include <QGridLayout>
 
 
 QT_BEGIN_NAMESPACE
@@ -104,7 +105,7 @@ public:
 
     [[nodiscard]] QPushButton *getExecutionPushButton();
 
-    [[nodiscard]] QGridLayout *getPcPoolManagementGridLayout();
+    [[nodiscard]] QGridLayout * getPcPoolManagementGridLayout();
 
 
 
