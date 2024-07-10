@@ -285,6 +285,8 @@ QString JobCreation::getOutputPath() const {
 /**
  * @class JobCreation
  * @brief This method returns the name from the job creation widget
+ *
+ * @return the name
  **/
 
 QString JobCreation::getName() {
@@ -353,6 +355,8 @@ QString JobCreation::getFormatName(const QString &selection) {
 /**
  * @class JobCreation
  * @brief This method returns the first image from the job creation widget
+ *
+ * @return the first image
  **/
 
 QString JobCreation::getFirstImage() const {
@@ -365,6 +369,8 @@ QString JobCreation::getFirstImage() const {
 /**
  * @class JobCreation
  * @brief This method returns the last image from the job creation widget
+ *
+ * @return the last image
  **/
 QString JobCreation::getLastImage() const {
     if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
@@ -376,6 +382,8 @@ QString JobCreation::getLastImage() const {
 /**
  * @class JobCreation
  * @brief This method returns the first index (calculated from the first image) from the job creation widget
+ *
+ * @return the first index
  **/
 QString JobCreation::getFirstIndex() const {
     if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
@@ -389,6 +397,8 @@ QString JobCreation::getFirstIndex() const {
 /**
  * @class JobCreation
  * @brief This method returns the last index (calculated from the last image and the number of batch images) from the job creation widget
+ *
+ * @return the last index
  **/
 QString JobCreation::getLastIndex() const {
     if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
@@ -408,6 +418,8 @@ QString JobCreation::getLastIndex() const {
 /**
  * @class JobCreation
  * @brief This method returns the camera name from the job creation widget
+ *
+ * @return the camera name
  **/
 QString JobCreation::getCameraName() const {
     if (job_creation_widget_->getCameraGroupBox()->isChecked()) {
@@ -419,6 +431,8 @@ QString JobCreation::getCameraName() const {
 /**
  * @class JobCreation
  * @brief This method returns the minimum cpu from the job creation widget
+ *
+ * @return the minimum cpu
  **/
 
 QString JobCreation::getMinCpu() const {
@@ -431,6 +445,8 @@ QString JobCreation::getMinCpu() const {
 /**
  * @class JobCreation
  * @brief This method returns the maximum cpu from the job creation widget if the cpu checkbox is not checked, it returns the default value (32)
+ *
+ * @return the maximum cpu
  **/
 QString JobCreation::getMaxCpu() const {
     if (job_creation_widget_->getCpuCheckBox()->isChecked()) {
@@ -441,6 +457,9 @@ QString JobCreation::getMaxCpu() const {
 
 /**
  * @class JobCreation
+ * @brief This method returns the submission option from the job creation widget
+ *
+ * @return the submission option
  **/
 QString JobCreation::getSubmissionOption() const {
     QString cpuInterval = getCpuInterval();
@@ -458,11 +477,18 @@ QString JobCreation::getSubmissionOption() const {
     if (!parcStyleList.isEmpty()) {
         submissionOptions.append(parcStyleList);
     } else {
-        //throw std::invalid_argument("No parc style selected");
+        throw std::invalid_argument("No parc style selected");
     }
 
     return submissionOptions.join(" && ");
 }
+
+/**
+ * @class JobCreation
+ * @brief This method returns the cpu interval from the job creation widget
+ *
+ * @return the cpu interval
+ **/
 
 QString JobCreation::getCpuInterval() const {
     if (job_creation_widget_->getCpuCheckBox()->isChecked()) {
@@ -473,6 +499,12 @@ QString JobCreation::getCpuInterval() const {
     return {};
 }
 
+/**
+ * @class JobCreation
+ * @brief This method returns the memory interval from the job creation widget
+ *
+ * @return the memory interval
+ **/
 QString JobCreation::getMemoryInterval() const {
     if (job_creation_widget_->getMemoryCheckBox()->isChecked()) {
         double memory = job_creation_widget_->getMemorySpinBox()->value() * 1024;
@@ -481,6 +513,12 @@ QString JobCreation::getMemoryInterval() const {
     return {};
 }
 
+/**
+ * @class JobCreation
+ * @brief This method returns the parc style list from the job creation widget
+ *
+ * @return the parc style list
+ **/
 QString JobCreation::getParcStyleList() const {
     QStringList parcStyleList;
 
@@ -501,6 +539,12 @@ QString JobCreation::getParcStyleList() const {
     }
 }
 
+/**
+ * @class JobCreation
+ * @brief This method returns the steps from the job creation widget
+ *
+ * @return the steps
+ **/
 QString JobCreation::getSteps() {
     if (job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
         return QString::number(job_creation_widget_->getBatchCalculationSpinBox()->value());
@@ -508,6 +552,12 @@ QString JobCreation::getSteps() {
     return {};
 }
 
+/**
+ * @class JobCreation
+ * @brief This method creates and executes a job
+ *
+ * @param priority the priority of the job
+ **/
 void JobCreation::createAndExecuteJob(QString priority) {
     createJob(std::move(priority));
     qDebug() << "Job created : " << job_.getJobName();
