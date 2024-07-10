@@ -600,21 +600,57 @@ void JobCreation::createAndExecuteJob(QString priority) {
     script.replaceScriptParameters(job_.getJobName() + ".bat", "lance.bat");
 
     //TODO : execute the job
+    QString output = script.executeScript("lance.bat");
 
     if (job_creation_widget_->getAnalysisCheckBox()->isChecked()) {
+        job_.addJobParameter("<previousJobID>", output);
+
         remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Skeleton_Analysis.txt)";
         remote_launchers_path = R"(I:\Mygale\Config_Blender_4_V2\lanceAnalysis.txt)";
         local_job_location = R"(I:\Mygale\TEMP\)" + job_.getJobName() + R"(\)";
 
-        job_.setJobName(job_.getJobName() + "_Analysis");
         job_.addJobParameter("<jobName>", job_.getJobName());
 
-        qDebug() << "Remote script path : " << remote_script_path << " Remote launchers path : " << remote_launchers_path
+        qDebug() << "Remote script path : " << remote_script_path
+                 << " Remote launchers path : " << remote_launchers_path
                  << " Local job location : " << local_job_location;
 
         BaseScript analysis_script(job_, remote_script_path, remote_launchers_path, local_job_location);
-        analysis_script.copyRemoteScript(job_.getJobName() + ".bat", "lanceAnalysis.bat");
+        analysis_script.copyRemoteScript(job_.getJobName() + "_Analysis.bat", "lanceAnalysis.bat");
         analysis_script.replaceScriptParameters(job_.getJobName() + ".bat", "lanceAnalysis.bat");
+
+        //TODO : execute the job
+        analysis_script.executeScript("lanceAnalysis.bat");
+
+
+        if (job_creation_widget_->getResubmissionCheckBox()->isChecked()) {
+            if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender") {
+                remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Blender\Skeleton_Blender_Resubmission.txt)";
+            } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray") {
+                remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2020Vray_Resubmission.txt)";
+            } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
+                remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2023Vray_Resubmission.txt)";
+            } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred") {
+                remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Vred\Skeleton_Vred_Resubmission.txt)";
+            }
+
+            remote_launchers_path = R"(I:\Mygale\Config_Blender_4_V2\lanceResubmission.txt)";
+            local_job_location = R"(I:\Mygale\TEMP\)" + job_.getJobName() + R"(\)";
+
+            job_.addJobParameter("<jobName>", job_.getJobName());
+
+            qDebug() << "Remote script path : " << remote_script_path << " Remote launchers path : "
+                     << remote_launchers_path
+                     << " Local job location : " << local_job_location;
+
+            BaseScript resubmission_script(job_, remote_script_path, remote_launchers_path, local_job_location);
+            resubmission_script.copyRemoteScript(job_.getJobName() + "_Resubmission.bat", "lanceResubmission.bat");
+            resubmission_script.replaceScriptParameters(job_.getJobName() + ".bat", "lanceResubmission.bat");
+
+            resubmission_script.executeScript("lanceResubmission.bat");
+        }
+
+
     }
 }
 

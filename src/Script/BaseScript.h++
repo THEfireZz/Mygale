@@ -5,16 +5,22 @@
 #ifndef MYGALE_BASESCRIPT_H
 #define MYGALE_BASESCRIPT_H
 
-
+#include <QProcess>
 #include "../JobCreation/Job.h++"
 
 class BaseScript {
 public:
+    QString getLocalScriptPath() const;
+
     explicit BaseScript(Job job,QString remoteScriptPath, QString remoteLaunchersPath, QString localJobLocation);
 
     void replaceScriptParameters(QString scriptName, QString launcherName) const ;
 
-    virtual void copyRemoteScript(QString scriptName, QString launcherName) const;
+    void copyRemoteScript(const QString &scriptName, const QString &launcherName) const;
+
+    void appendResubmissionJobExecutionLine(const QString& executionLine, const QString& scriptName) const;
+
+    QString executeScript(const QString& scriptName) const;
 
 protected:
     Job job_;
