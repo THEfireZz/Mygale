@@ -200,6 +200,7 @@ Job JobCreation::createJob(QString priority) {
     QString output_path = getOutputPath();
     QString name = getName();
     QString format = getFormat();
+    QString raw_format = getRawFormat(format);
     QString first_image = getFirstImage();
     QString last_image = getLastImage();
     QString first_index = getFirstIndex();
@@ -220,6 +221,7 @@ Job JobCreation::createJob(QString priority) {
                     {"<output>",           output_path},
                     {"<name>",             name},
                     {"<format>",           format},
+                    {"<rawFormat>",        raw_format},
                     {"<firstImg>",         first_image},
                     {"<lastImg>",          last_image},
                     {"<firstIndex>",       first_index},
