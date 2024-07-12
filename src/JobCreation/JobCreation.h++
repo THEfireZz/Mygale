@@ -8,6 +8,8 @@
 #include <QLineEdit>
 #include <QFileDialog>
 #include <QXmlStreamReader>
+#include <QStorageInfo>
+#include <windows.h>
 #include "JobCreationWidget.h++"
 #include "Job.h++"
 #include "../Script/BaseScript.h++"
@@ -41,6 +43,8 @@ private:
 
     static QStringList getFormatsFromConfigFile(const QString &configFilePath, const QString &jobType);
 
+    static QString convertToUncPath(const QString &path);
+
     [[nodiscard]] QString getJobType() const;
 
     [[nodiscard]] QString getJobName() const;
@@ -71,15 +75,15 @@ private:
 
     [[nodiscard]] QString getSubmissionOption() const;
 
-    QString getName();
+    [[nodiscard]] QString getName();
 
-    QString getCpuInterval() const;
+    [[nodiscard]] QString getCpuInterval() const;
 
-    QString getMemoryInterval() const;
+    [[nodiscard]] QString getMemoryInterval() const;
 
-    QString getParcStyleList() const;
+    [[nodiscard]] QString getParcStyleList() const;
 
-    QString getSteps();
+    [[nodiscard]] QString getSteps();
 };
 
 

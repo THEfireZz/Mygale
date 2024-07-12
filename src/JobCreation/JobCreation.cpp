@@ -112,7 +112,6 @@ void JobCreation::openOutputFolderDialog() {
  *
  * @throw runtime_error if the file could not be opened
  **/
-
 QStringList JobCreation::getJobTypesFromConfigFile(const QString &configFilePath) {
     QStringList job_types;
     QFile file(configFilePath);
@@ -151,7 +150,6 @@ QStringList JobCreation::getJobTypesFromConfigFile(const QString &configFilePath
  *
  * @return a list of formats
  **/
-
 QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath, const QString &jobType) {
     QStringList formats;
     QFile file(configFilePath);
@@ -194,7 +192,7 @@ QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath,
  **/
 Job JobCreation::createJob(QString priority) {
     QString job_name = getJobName();
-    QString path = "I:\\";
+    QString path = convertToUncPath("I:/");
     QString job_type = getJobType();
     QString scene_path = getScenePath();
     QString output_path = getOutputPath();
@@ -244,7 +242,6 @@ Job JobCreation::createJob(QString priority) {
  *
  * @return the job type
  **/
-
 QString JobCreation::getJobType() const {
     return job_creation_widget_->getJobTypeComboBox()->currentText();
 }
@@ -255,7 +252,6 @@ QString JobCreation::getJobType() const {
  *
  * @return the job name
  **/
-
 QString JobCreation::getJobName() const {
     return job_creation_widget_->getJobNameLineEdit()->text();
 }
@@ -266,9 +262,8 @@ QString JobCreation::getJobName() const {
  *
  * @return the scene path
  **/
-
 QString JobCreation::getScenePath() const {
-    return job_creation_widget_->getSceneLineEdit()->text();
+    return convertToUncPath(job_creation_widget_->getSceneLineEdit()->text());
 }
 
 /**
@@ -277,9 +272,8 @@ QString JobCreation::getScenePath() const {
  *
  * @return the output path
  **/
-
 QString JobCreation::getOutputPath() const {
-    return job_creation_widget_->getOutputLineEdit()->text();
+    return convertToUncPath(job_creation_widget_->getOutputLineEdit()->text());
 }
 
 /**
@@ -288,7 +282,6 @@ QString JobCreation::getOutputPath() const {
  *
  * @return the name
  **/
-
 QString JobCreation::getName() {
     if (job_creation_widget_->getImagesNameCheckBox()->isChecked()) {
         return job_creation_widget_->getJobNameLineEdit()->text();
@@ -303,7 +296,6 @@ QString JobCreation::getName() {
  *
  * @return the format
  **/
-
 QString JobCreation::getFormat() const {
     //TODO : Add the format prefix
     if (job_creation_widget_->getImagesFormatCheckBox()->isChecked()) {
@@ -327,7 +319,6 @@ QString JobCreation::getFormat() const {
  *
  * @return the raw format
  **/
-
 QString JobCreation::getRawFormat(const QString &selection) {
     static QRegularExpression regex(R"(\[\*\.(\w+)\])");
     if (auto match = regex.match(selection); match.hasMatch()) {
@@ -358,7 +349,6 @@ QString JobCreation::getFormatName(const QString &selection) {
  *
  * @return the first image
  **/
-
 QString JobCreation::getFirstImage() const {
     if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
         return job_creation_widget_->getSingleImageSpinBox()->text();
@@ -434,7 +424,6 @@ QString JobCreation::getCameraName() const {
  *
  * @return the minimum cpu
  **/
-
 QString JobCreation::getMinCpu() const {
     if (job_creation_widget_->getCpuCheckBox()->isChecked()) {
         return job_creation_widget_->getMinCpuSpinBox()->text();
@@ -489,7 +478,6 @@ QString JobCreation::getSubmissionOption() const {
  *
  * @return the cpu interval
  **/
-
 QString JobCreation::getCpuInterval() const {
     if (job_creation_widget_->getCpuCheckBox()->isChecked()) {
         QString minCpu = getMinCpu();
@@ -651,6 +639,21 @@ void JobCreation::createAndExecuteJob(QString priority) {
         }
 
 
+    }
+}
+
+QString JobCreation::convertToUncPath(const QString &path) {
+    // Path = I:/Mygale/TEMP/JobName/
+    QString uncPath = path;
+    if (!QFileInfo::exists(path)) {
+        throw std::invalid_argument("The path does not exist");
+    }
+    QStorageInfo storageInfo(path);
+    DWORD driveType = GetDriveType((LPCWSTR) storageInfo.rootPath().utf16());
+    if (driveType == DRIVE_REMOTE) {
+        return uncPath.replace("I:/", storageInfo.device()).replace("/", "\\");
+    } else {
+        throw std::invalid_argument("The path is not a network path");
     }
 }
 

@@ -19,29 +19,36 @@ BaseScript::copyRemoteScript(const QString &scriptName, const QString &launcherN
     // Create the local job location folder if it does not exist
     if (QDir local_job_location(local_job_location_); !local_job_location.exists()) {
         local_job_location.mkpath(".");
+        local_job_location.mkpath("lsf");
+        local_job_location.mkpath("appli");
     }
 
     // Copy the remote script to the local job location
-    QFile remote_script(remote_script_path_);
-    if (!remote_script.copy(local_job_location_ + scriptName)) {
+    if (QFile remote_script(remote_script_path_); !remote_script.copy(local_job_location_ + "lsf/" + scriptName)) {
         // throw exception
         throw std::runtime_error("Could not copy the remote script " + remote_script_path_.toStdString() +
                                  " to the local job location " + local_job_location_.toStdString() + " Error: " +
                                  remote_script.errorString().toStdString());
     }
+    qDebug() << "Copied the remote script " << remote_script_path_ << " to the local job location "
+             << local_job_location_ + "lsf/" + scriptName;
 
     // Copy the remote launchers to the local job location
-    QFile remote_launchers(remote_launchers_path_);
-    if (!remote_launchers.copy(local_job_location_ + launcherName)) {
+    if (QFile remote_launchers(remote_launchers_path_); !remote_launchers.copy(
+            local_job_location_ + "lsf/" + launcherName)) {
         // throw exception
-        throw std::runtime_error("Could not copy the remote launchers to the local job location");
+        throw std::runtime_error("Could not copy the remote launchers " + remote_launchers_path_.toStdString() +
+                                 " to the local job location " + local_job_location_.toStdString() + " Error: " +
+                                 remote_launchers.errorString().toStdString());
     }
+    qDebug() << "Copied the remote launchers " << remote_launchers_path_ << " to the local job location "
+             << local_job_location_ + "lsf/" + launcherName;
 
 }
 
-void BaseScript::replaceScriptParameters(QString scriptName, QString launcherName) const {
+void BaseScript::replaceScriptParameters(const QString &scriptName, const QString &launcherName) const {
     // Open the script file
-    QFile script_file(local_job_location_ + scriptName);
+    QFile script_file(local_job_location_ + "lsf/" + scriptName);
     if (!script_file.open(QIODevice::ReadWrite | QIODevice::Text)) {
         // throw exception
         throw std::runtime_error("Could not open the script file, error: " + script_file.errorString().toStdString());
@@ -63,7 +70,7 @@ void BaseScript::replaceScriptParameters(QString scriptName, QString launcherNam
     script_file.close();
 
     // Open the launchers file
-    QFile launchers_file(local_job_location_ + launcherName);
+    QFile launchers_file(local_job_location_ + "lsf/" + launcherName);
     if (!launchers_file.open(QIODevice::ReadWrite | QIODevice::Text)) {
         // throw exception
         throw std::runtime_error("Could not open the launchers file");
@@ -85,11 +92,12 @@ void BaseScript::replaceScriptParameters(QString scriptName, QString launcherNam
 
 void BaseScript::appendResubmissionJobExecutionLine(const QString &executionLine, const QString &scriptName) const {
     // Open the script file
-    QFile script_file(local_job_location_ + scriptName);
+    QFile script_file(local_job_location_ + "lsf/" + scriptName);
     if (!script_file.open(QIODevice::ReadWrite | QIODevice::Text)) {
         // throw exception
         throw std::runtime_error("Appening: Could not open the script file " + scriptName.toStdString() + " Error: " +
-                                 script_file.errorString().toStdString() + " at location " + local_job_location_.toStdString());
+                                 script_file.errorString().toStdString() + " at location " +
+                                 local_job_location_.toStdString());
     }
 
     // Read the script file
@@ -106,17 +114,15 @@ void BaseScript::appendResubmissionJobExecutionLine(const QString &executionLine
 
 }
 
-QString BaseScript::getLocalScriptPath() const {
-    return local_job_location_ + job_.getJobName() + ".bat";
-}
-
 QString BaseScript::executeScript(const QString &scriptName) const {
     QProcess process;
-    process.setWorkingDirectory(local_job_location_);
-    // Execute the batch script
-    QProcess::startDetached("cmd.exe", QStringList() << "/c" << local_job_location_ + scriptName);
-    process.waitForFinished(-1);
+    process.setWorkingDirectory(local_job_location_ + "lsf");
 
+    QString fullScriptPath = local_job_location_ + "lsf/" + scriptName;
+    qDebug() << "Executing script: " << fullScriptPath;
+
+    process.start("cmd.exe", QStringList() << "/c" << fullScriptPath);
+    process.waitForFinished(-1);
     return process.readAllStandardOutput();
 }
 

@@ -14,7 +14,7 @@ public:
 
     explicit BaseScript(Job job,QString remoteScriptPath, QString remoteLaunchersPath, QString localJobLocation);
 
-    void replaceScriptParameters(QString scriptName, QString launcherName) const ;
+    void replaceScriptParameters(const QString& scriptName, const QString& launcherName) const ;
 
     void copyRemoteScript(const QString &scriptName, const QString &launcherName) const;
 
