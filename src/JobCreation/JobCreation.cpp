@@ -278,13 +278,18 @@ QString JobCreation::getOutputPath() const {
 
 /**
  * @class JobCreation
- * @brief This method returns the name from the job creation widget
+ * @brief This method returns the name from the job creation widget and adds the prefix if the job type is Maya_2020/Vray or Maya_2023/Vray
  *
  * @return the name
  **/
 QString JobCreation::getName() {
+    QString prefix = "";
+    if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray" ||
+        job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
+        prefix = "-im ";
+    }
     if (job_creation_widget_->getImagesNameCheckBox()->isChecked()) {
-        return job_creation_widget_->getJobNameLineEdit()->text();
+        return prefix + job_creation_widget_->getJobNameLineEdit()->text();
     }
     return {};
 
@@ -292,12 +297,18 @@ QString JobCreation::getName() {
 
 /**
  * @class JobCreation
- * @brief This method returns the format from the job creation widget depending on the job type
+ * @brief This method returns the format from the job creation widget depending on the job type and adds the prefix if the job type is Blender or Maya_2020/Vray or Maya_2023/Vray
  *
  * @return the format
  **/
 QString JobCreation::getFormat() const {
-    //TODO : Add the format prefix
+    QString prefix = "";
+    if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender") {
+        prefix = "-F ";
+    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray" ||
+               job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
+        prefix = "-of ";
+    }
     if (job_creation_widget_->getImagesFormatCheckBox()->isChecked()) {
         QString selection = job_creation_widget_->getImagesFormatComboBox()->currentText();
         QString result;
@@ -306,7 +317,7 @@ QString JobCreation::getFormat() const {
         } else {
             result = getFormatName(selection);
         }
-        return result;
+        return prefix + result;
     }
     return {};
 }
@@ -412,6 +423,11 @@ QString JobCreation::getLastIndex() const {
  * @return the camera name
  **/
 QString JobCreation::getCameraName() const {
+    QString prefix = "";
+    if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray" ||
+        job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
+        prefix = "-cam ";
+    }
     if (job_creation_widget_->getCameraGroupBox()->isChecked()) {
         return job_creation_widget_->getCameraLineEdit()->text();
     }
@@ -586,12 +602,13 @@ void JobCreation::createAndExecuteJob(QString priority) {
     BaseScript script(job_, remote_script_path, remote_launchers_path, local_job_location);
     script.copyRemoteScript(job_.getJobName() + ".bat", "lance.bat");
     script.replaceScriptParameters(job_.getJobName() + ".bat", "lance.bat");
-
-    //TODO : execute the job
     QString output = script.executeScript("lance.bat");
 
+    qDebug() << "Output : " << output;
+
     if (job_creation_widget_->getAnalysisCheckBox()->isChecked()) {
-        job_.addJobParameter("<previousJobID>", output);
+        static QRegularExpression regex(R"(\d+)");
+        job_.addJobParameter("<previousJobID>", regex.match(output).captured(0));
 
         remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Skeleton_Analysis.txt)";
         remote_launchers_path = R"(I:\Mygale\Config_Blender_4_V2\lanceAnalysis.txt)";
@@ -605,7 +622,7 @@ void JobCreation::createAndExecuteJob(QString priority) {
 
         BaseScript analysis_script(job_, remote_script_path, remote_launchers_path, local_job_location);
         analysis_script.copyRemoteScript(job_.getJobName() + "_Analysis.bat", "lanceAnalysis.bat");
-        analysis_script.replaceScriptParameters(job_.getJobName() + ".bat", "lanceAnalysis.bat");
+        analysis_script.replaceScriptParameters(job_.getJobName() + "_Analysis.bat", "lanceAnalysis.bat");
 
         //TODO : execute the job
         analysis_script.executeScript("lanceAnalysis.bat");
