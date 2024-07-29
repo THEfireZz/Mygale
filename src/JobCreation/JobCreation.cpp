@@ -71,11 +71,10 @@ void JobCreation::incrementJobNumber() {
  **/
 void JobCreation::openSceneFileDialog() {
     QString filter;
-    //Blender or Maya_2020/Vray // Maya_2023/Vray or vred
+    //Blender or Maya_2023/Vray or vred
     if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender") {
         filter = "Scene Files (*.blend)";
-    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray" ||
-               job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
+    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
         filter = "Scene Files (*.ma *.mb)";
     } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred") {
         filter = "Scene Files (*.vpb)";
@@ -278,14 +277,13 @@ QString JobCreation::getOutputPath() const {
 
 /**
  * @class JobCreation
- * @brief This method returns the name from the job creation widget and adds the prefix if the job type is Maya_2020/Vray or Maya_2023/Vray
+ * @brief This method returns the name from the job creation widget and adds the prefix if the job type is Maya_2023/Vray and adds the prefix if needed
  *
  * @return the name
  **/
 QString JobCreation::getName() {
     QString prefix = "";
-    if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray" ||
-        job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
+    if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
         prefix = "-im ";
     }
     if (job_creation_widget_->getImagesNameCheckBox()->isChecked()) {
@@ -297,7 +295,7 @@ QString JobCreation::getName() {
 
 /**
  * @class JobCreation
- * @brief This method returns the format from the job creation widget depending on the job type and adds the prefix if the job type is Blender or Maya_2020/Vray or Maya_2023/Vray
+ * @brief This method returns the format from the job creation widget depending on the job type and adds the prefix if the job type is Blender or Maya_2023/Vray and adds the prefix if needed
  *
  * @return the format
  **/
@@ -305,8 +303,7 @@ QString JobCreation::getFormat() const {
     QString prefix = "";
     if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender") {
         prefix = "-F ";
-    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray" ||
-               job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
+    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
         prefix = "-of ";
     }
     if (job_creation_widget_->getImagesFormatCheckBox()->isChecked()) {
@@ -418,14 +415,13 @@ QString JobCreation::getLastIndex() const {
 
 /**
  * @class JobCreation
- * @brief This method returns the camera name from the job creation widget
+ * @brief This method returns the camera name from the job creation widget and adds the prefix if the job type is Maya_2023/Vray and adds the prefix if needed
  *
  * @return the camera name
  **/
 QString JobCreation::getCameraName() const {
     QString prefix = "";
-    if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray" ||
-        job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
+    if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
         prefix = "-cam ";
     }
     if (job_creation_widget_->getCameraGroupBox()->isChecked()) {
@@ -573,12 +569,6 @@ void JobCreation::createAndExecuteJob(QString priority) {
         } else {
             remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Blender\Skeleton_Blender_MultipleImage.txt)";
         }
-    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray") {
-        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2020Vray.txt)";
-        } else {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2020Vray_MultipleImage.txt)";
-        }
     } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
         if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
             remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2023Vray.txt)";
@@ -631,8 +621,6 @@ void JobCreation::createAndExecuteJob(QString priority) {
         if (job_creation_widget_->getResubmissionCheckBox()->isChecked()) {
             if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender") {
                 remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Blender\Skeleton_Blender_Resubmission.txt)";
-            } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2020/Vray") {
-                remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2020Vray_Resubmission.txt)";
             } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
                 remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2023Vray_Resubmission.txt)";
             } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred") {
