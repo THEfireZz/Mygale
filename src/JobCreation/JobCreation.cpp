@@ -197,7 +197,7 @@ Job JobCreation::createJob(QString priority) {
     QString output_path = getOutputPath();
     QString name = getName();
     QString format = getFormat();
-    QString raw_format = getRawFormat(format);
+    QString raw_format = getRawFormat(job_creation_widget_->getImagesFormatComboBox()->currentText());
     QString first_image = getFirstImage();
     QString last_image = getLastImage();
     QString first_index = getFirstIndex();
@@ -579,7 +579,7 @@ void JobCreation::createAndExecuteJob(QString priority) {
         if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
             remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Vred\Skeleton_Vred.txt)";
         } else {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Vred\Skeleton_Vred_Ressubmission.txt)";
+            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Vred\Skeleton_Vred_Resubmission.txt)";
         }
     }
 
@@ -612,11 +612,6 @@ void JobCreation::createAndExecuteJob(QString priority) {
 
         BaseScript analysis_script(job_, remote_script_path, remote_launchers_path, local_job_location);
         analysis_script.copyRemoteScript(job_.getJobName() + "_Analysis.bat", "lanceAnalysis.bat");
-        analysis_script.replaceScriptParameters(job_.getJobName() + "_Analysis.bat", "lanceAnalysis.bat");
-
-        //TODO : execute the job
-        analysis_script.executeScript("lanceAnalysis.bat");
-
 
         if (job_creation_widget_->getResubmissionCheckBox()->isChecked()) {
             if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender") {
@@ -638,12 +633,15 @@ void JobCreation::createAndExecuteJob(QString priority) {
 
             BaseScript resubmission_script(job_, remote_script_path, remote_launchers_path, local_job_location);
             resubmission_script.copyRemoteScript(job_.getJobName() + "_Resubmission.bat", "lanceResubmission.bat");
-            resubmission_script.replaceScriptParameters(job_.getJobName() + ".bat", "lanceResubmission.bat");
+            resubmission_script.appendResubmissionJobExecutionLine(
+                    R"(I:\Mygale\Config_Blender_4_V2\resubmissionExecutionLine.txt)",
+                    job_.getJobName() + "_Analysis.bat");
 
-            resubmission_script.executeScript("lanceResubmission.bat");
+            resubmission_script.replaceScriptParameters(job_.getJobName() + "_Resubmission.bat", "lanceResubmission.bat");
         }
 
-
+        analysis_script.replaceScriptParameters(job_.getJobName() + "_Analysis.bat", "lanceAnalysis.bat");
+        analysis_script.executeScript("lanceAnalysis.bat");
     }
 }
 

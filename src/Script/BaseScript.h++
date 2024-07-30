@@ -18,7 +18,7 @@ public:
 
     void copyRemoteScript(const QString &scriptName, const QString &launcherName) const;
 
-    void appendResubmissionJobExecutionLine(const QString& executionLine, const QString& scriptName) const;
+    void appendResubmissionJobExecutionLine(const QString& executionLinePath, const QString& scriptName) const;
 
     QString executeScript(const QString& scriptName) const;
 

@@ -24,7 +24,7 @@ BaseScript::copyRemoteScript(const QString &scriptName, const QString &launcherN
     }
 
     // Copy the remote script to the local job location
-    if (QFile remote_script(remote_script_path_); !remote_script.copy(local_job_location_ + "lsf/" + scriptName)) {
+    if (QFile remote_script(remote_script_path_); !remote_script.copy(local_job_location_ + "lsf\\" + scriptName)) {
         // throw exception
         throw std::runtime_error("Could not copy the remote script " + remote_script_path_.toStdString() +
                                  " to the local job location " + local_job_location_.toStdString() + " Error: " +
@@ -90,22 +90,39 @@ void BaseScript::replaceScriptParameters(const QString &scriptName, const QStrin
     launchers_file.close();
 }
 
-void BaseScript::appendResubmissionJobExecutionLine(const QString &executionLine, const QString &scriptName) const {
+/**
+ * @class BaseScript
+ * @brief This method appends the resubmission job execution line to the script file
+ *
+ * @param executionLinePath The path of the file containing the execution line
+ * @param scriptName The name of the script file to append the execution line
+ **/
+
+void BaseScript::appendResubmissionJobExecutionLine(const QString &executionLinePath, const QString &scriptName) const {
     // Open the script file
     QFile script_file(local_job_location_ + "lsf/" + scriptName);
     if (!script_file.open(QIODevice::ReadWrite | QIODevice::Text)) {
         // throw exception
-        throw std::runtime_error("Appening: Could not open the script file " + scriptName.toStdString() + " Error: " +
-                                 script_file.errorString().toStdString() + " at location " +
-                                 local_job_location_.toStdString());
+        throw std::runtime_error("Could not open the script file, error: " + script_file.errorString().toStdString());
     }
 
     // Read the script file
     QTextStream script_stream(&script_file);
     QString script = script_stream.readAll();
 
-    // Append the resubmission job execution line
-    script.append(executionLine);
+    // Open the execution line file
+    QFile execution_line_file(executionLinePath);
+    if (!execution_line_file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        // throw exception
+        throw std::runtime_error("Could not open the execution line file, error: " + execution_line_file.errorString().toStdString());
+    }
+
+    // Read the execution line file
+    QTextStream execution_line_stream(&execution_line_file);
+    QString execution_line = execution_line_stream.readAll();
+
+    // Append the execution line to the script
+    script.append(execution_line);
 
     // Write the script file
     script_file.resize(0);
