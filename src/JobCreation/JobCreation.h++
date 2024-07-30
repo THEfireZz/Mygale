@@ -8,8 +8,11 @@
 #include <QLineEdit>
 #include <QFileDialog>
 #include <QXmlStreamReader>
+#include <QStorageInfo>
+#include <windows.h>
 #include "JobCreationWidget.h++"
 #include "Job.h++"
+#include "../Script/BaseScript.h++"
 
 class JobCreation {
 public:
@@ -19,7 +22,9 @@ public:
 
     void initialize();
 
-    Job createJob();
+    Job createJob(QString priority);
+
+    void createAndExecuteJob(QString priority);
 
 private:
     JobCreationWidget *job_creation_widget_;
@@ -37,6 +42,8 @@ private:
     static QStringList getJobTypesFromConfigFile(const QString &configFilePath);
 
     static QStringList getFormatsFromConfigFile(const QString &configFilePath, const QString &jobType);
+
+    static QString convertToUncPath(const QString &path);
 
     [[nodiscard]] QString getJobType() const;
 
@@ -66,8 +73,17 @@ private:
 
     [[nodiscard]] QString getMaxCpu() const;
 
-    [[nodiscard]] QString getMinMemory() const;
+    [[nodiscard]] QString getSubmissionOption() const;
 
+    [[nodiscard]] QString getName();
+
+    [[nodiscard]] QString getCpuInterval() const;
+
+    [[nodiscard]] QString getMemoryInterval() const;
+
+    [[nodiscard]] QString getParcStyleList() const;
+
+    [[nodiscard]] QString getSteps();
 };
 
 

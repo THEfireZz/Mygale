@@ -2,6 +2,8 @@
 // Created by SD43247 on 04/07/2024.
 //
 
+#include <utility>
+
 #include "Job.h++"
 
 QString Job::getJobName() const {
@@ -14,6 +16,14 @@ QString Job::getJobType() const {
 
 QHash<QString, QString> Job::getJobParameters() const {
     return job_parameters_;
+}
+
+void Job::addJobParameter(const QString &key, const QString &value) {
+    job_parameters_[key] = value;
+}
+
+void Job::setJobName(QString newJobName) {
+    job_name_ = std::move(newJobName);
 }
 
 /**

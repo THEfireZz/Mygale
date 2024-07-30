@@ -24,6 +24,8 @@ public:
 
     [[nodiscard]] QHash<QString, QString> getJobParameters() const;
 
+    void addJobParameter(const QString &key, const QString &value);
+
     class Builder {
     private:
         QHash<QString, QString> job_parameters_;
@@ -44,6 +46,7 @@ public:
         Job build() const;
     };
 
+    void setJobName(QString newJobName);
 };
 
 

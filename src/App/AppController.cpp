@@ -17,6 +17,6 @@ void AppController::initialize() {
     main_window_ = std::make_unique<MainWindow>();
     main_window_->show();
 
-    job_creation_ = std::make_unique<JobCreation>(main_window_->getJobCreationWidget(), R"(I:\Mygale\Config\mainConfig.xml)");
+    job_creation_ = std::make_unique<JobCreation>(main_window_->getJobCreationWidget(), R"(I:\Mygale\Config_Blender_4_V2\mainConfig.xml)");
     job_creation_->initialize();
 }

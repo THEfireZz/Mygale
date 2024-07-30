@@ -4,6 +4,9 @@
 
 // You may need to build the project (run Qt uic code generator) to get "ui_MygaleWidget.h" resolved
 
+#include <QGridLayout>
+#include <qfile.h>
+#include <QXmlStreamReader>
 #include "JobCreationWidget.h++"
 #include "../../resources/ui/ui_JobCreationWidget.h"
 
@@ -63,6 +66,7 @@ QSpinBox *JobCreationWidget::getBatchCalculationSpinBox() {
 
 void JobCreationWidget::initialize() {
     connectSignalsAndSlots();
+    loadPcPoolManagmentChoice();
 }
 
 void JobCreationWidget::connectSignalsAndSlots() {
@@ -91,6 +95,43 @@ void JobCreationWidget::connectSignalsAndSlots() {
 
     connect(getAnalysisCheckBox(), &QCheckBox::toggled,
             [this](bool checked) { analysisCheckBoxToggled(checked); });
+}
+
+void JobCreationWidget::loadPcPoolManagmentChoice() {
+    QStringList pcPoolManagementOptions;
+    int row = 0;
+    int column = 0;
+
+    QFile file(R"(I:\Mygale\Config_Blender_4_V2\mainConfig.xml)");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        throw std::runtime_error("Could not open file : " + file.fileName().toStdString());
+    }
+
+    QXmlStreamReader xmlReader(&file);
+
+    while (!xmlReader.atEnd() && !xmlReader.hasError()) {
+        xmlReader.readNext();
+        if (!xmlReader.isStartElement() || xmlReader.name().toString() != "PcPoolManagementOption") {
+            continue;
+        }
+
+        while (xmlReader.readNextStartElement()) {
+            if (xmlReader.name().toString() == "Option") {
+                pcPoolManagementOptions.append(xmlReader.readElementText());
+            } else {
+                xmlReader.skipCurrentElement();
+            }
+        }
+    }
+    file.close();
+
+    for (const auto &option: pcPoolManagementOptions) {
+        auto *checkBox = new QCheckBox(option);
+        checkBox->setProperty("LSF", option.toLower());
+        getPcPoolManagementGridLayout()->addWidget(checkBox, row / 3, column % 3);
+        ++column;
+        ++row;
+    }
 }
 
 QCheckBox *JobCreationWidget::getImagesNameCheckBox() {
@@ -187,6 +228,14 @@ QLineEdit *JobCreationWidget::getCameraLineEdit() {
 
 QGroupBox *JobCreationWidget::getCameraGroupBox() {
     return ui->cameraGroupBox;
+}
+
+QPushButton *JobCreationWidget::getExecutionPushButton() {
+    return ui->executionPushButton;
+}
+
+QGridLayout * JobCreationWidget::getPcPoolManagementGridLayout() {
+    return ui->pcPoolManagementGridLayout;
 }
 
 /**

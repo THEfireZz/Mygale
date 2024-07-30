@@ -14,6 +14,8 @@
 #include <QToolButton>
 #include <QLineEdit>
 #include <QGroupBox>
+#include <QPushButton>
+#include <QGridLayout>
 
 
 QT_BEGIN_NAMESPACE
@@ -101,6 +103,10 @@ public:
 
     [[nodiscard]] QGroupBox *getCameraGroupBox();
 
+    [[nodiscard]] QPushButton *getExecutionPushButton();
+
+    [[nodiscard]] QGridLayout * getPcPoolManagementGridLayout();
+
 
 
 
@@ -127,6 +133,7 @@ private:
     void analysisCheckBoxToggled(bool checked);
 
 
+    void loadPcPoolManagmentChoice();
 };
 
 
