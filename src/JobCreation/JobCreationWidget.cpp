@@ -7,6 +7,7 @@
 #include <QGridLayout>
 #include <qfile.h>
 #include <QXmlStreamReader>
+#include <QSettings>
 #include "JobCreationWidget.h++"
 #include "../../resources/ui/ui_JobCreationWidget.h"
 #include "../exception/CustomErrors.h++"
@@ -96,6 +97,8 @@ void JobCreationWidget::connectSignalsAndSlots() {
 
     connect(getAnalysisCheckBox(), &QCheckBox::toggled,
             [this](bool checked) { analysisCheckBoxToggled(checked); });
+
+    connect(this, &JobCreationWidget::close, this, &JobCreationWidget::saveUserInput);
 }
 
 void JobCreationWidget::loadPcPoolManagmentChoice() {
@@ -235,7 +238,7 @@ QPushButton *JobCreationWidget::getExecutionPushButton() {
     return ui->executionPushButton;
 }
 
-QGridLayout * JobCreationWidget::getPcPoolManagementGridLayout() {
+QGridLayout *JobCreationWidget::getPcPoolManagementGridLayout() {
     return ui->pcPoolManagementGridLayout;
 }
 
@@ -344,6 +347,38 @@ void JobCreationWidget::memoryCheckBoxToggled(bool checked) {
  **/
 void JobCreationWidget::analysisCheckBoxToggled(bool checked) {
     getResubmissionCheckBox()->setEnabled(checked);
+}
+
+void JobCreationWidget::saveUserInput() const {
+    qDebug() << "Saving user input";
+    QSettings settings("Stellantis", "Mygale");
+    settings.beginGroup("MainWindow");
+    settings.beginGroup("JobCreationWidget");
+
+    for (QWidget *widget: this->findChildren<QWidget *>()) {
+        const QString objectName = widget->objectName();
+        if (!objectName.isEmpty()) {
+
+            if (auto const *lineEdit = qobject_cast<QLineEdit *>(widget)) {
+                settings.setValue(objectName, lineEdit->text());
+            }
+            if (auto const *comboBox = qobject_cast<QComboBox *>(widget)) {
+                settings.setValue(objectName, comboBox->currentIndex());
+            }
+            if (auto const *checkBox = qobject_cast<QCheckBox *>(widget)) {
+                settings.setValue(objectName, checkBox->isChecked());
+            }
+            if (auto const *spinBox = qobject_cast<QSpinBox *>(widget)) {
+                settings.setValue(objectName, spinBox->value());
+            }
+            if (auto const *radioButton = qobject_cast<QRadioButton *>(widget)) {
+                settings.setValue(objectName, radioButton->isChecked());
+            }
+        }
+        if (settings.contains("qt_spinbox_lineedit"))
+            settings.remove("qt_spinbox_lineedit");
+
+    }
 }
 
 

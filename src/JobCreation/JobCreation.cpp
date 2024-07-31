@@ -3,6 +3,7 @@
 //
 
 #include <utility>
+#include <QSettings>
 
 #include "JobCreation.h++"
 #include "../exception/CustomErrors.h++"
@@ -25,6 +26,34 @@ void JobCreation::initialize() {
     QStringList formats = getFormatsFromConfigFile(config_file_path_,
                                                    job_creation_widget_->getJobTypeComboBox()->currentText());
     job_creation_widget_->getImagesFormatComboBox()->addItems(formats);
+}
+
+void JobCreation::loadUserInput() const {
+    qDebug() << "Loading user input";
+
+    QSettings settings("Stellantis", "Mygale");
+    settings.beginGroup("MainWindow");
+    settings.beginGroup("JobCreationWidget");
+
+    QStringList keys = settings.childKeys();
+    foreach (const QString &key, keys) {
+        qDebug() << key << " : " << settings.value(key).toString();
+    }
+    for (QWidget *widget: job_creation_widget_->findChildren<QWidget *>()) {
+        const QString objectName = widget->objectName();
+        if (keys.contains(objectName)) {
+            if (auto *lineEdit = qobject_cast<QLineEdit *>(widget)) {
+                lineEdit->setText(settings.value(objectName).toString());
+            } else if (auto *comboBox = qobject_cast<QComboBox *>(widget)) {
+                comboBox->setCurrentIndex(settings.value(objectName).toInt());
+            } else if (auto *checkBox = qobject_cast<QCheckBox *>(widget)) {
+                checkBox->setChecked(settings.value(objectName).toBool());
+            } else if (auto *spinBox = qobject_cast<QSpinBox *>(widget)) {
+                spinBox->setValue(settings.value(objectName).toInt());
+            }
+        }
+    }
+
 }
 
 void JobCreation::connectSignalsAndSlots() {
