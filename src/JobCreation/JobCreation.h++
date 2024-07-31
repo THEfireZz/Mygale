@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QXmlStreamReader>
 #include <QStorageInfo>
+#include <QMessageBox>
 #include <windows.h>
 #include "JobCreationWidget.h++"
 #include "Job.h++"

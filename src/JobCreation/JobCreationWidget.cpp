@@ -9,6 +9,7 @@
 #include <QXmlStreamReader>
 #include "JobCreationWidget.h++"
 #include "../../resources/ui/ui_JobCreationWidget.h"
+#include "../exception/CustomErrors.h++"
 
 
 JobCreationWidget::JobCreationWidget(QWidget *parent) :
@@ -104,7 +105,7 @@ void JobCreationWidget::loadPcPoolManagmentChoice() {
 
     QFile file(R"(I:\Mygale\Config_Blender_4_V2\mainConfig.xml)");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        throw std::runtime_error("Could not open file : " + file.fileName().toStdString());
+        throw FileOpenException("Could not open the file " + file.fileName());
     }
 
     QXmlStreamReader xmlReader(&file);

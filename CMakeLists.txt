@@ -33,6 +33,7 @@ set(HEADERS
         src/JobCreation/JobCreation.h++
         src/JobCreation/Job.h++
         src/Script/BaseScript.h++
+        src/exception/CustomErrors.h++
 )
 
 #add the ui files
