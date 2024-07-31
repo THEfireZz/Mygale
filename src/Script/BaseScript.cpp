@@ -7,6 +7,7 @@
 #include <qdir.h>
 
 #include "BaseScript.h++"
+#include "../exception/CustomErrors.h++"
 
 BaseScript::BaseScript(Job job, QString remoteScriptPath, QString remoteLaunchersPath, QString localJobLocation) : job_(
         std::move(job)), remote_script_path_(std::move(remoteScriptPath)), remote_launchers_path_(
@@ -26,20 +27,20 @@ BaseScript::copyRemoteScript(const QString &scriptName, const QString &launcherN
     // Copy the remote script to the local job location
     if (QFile remote_script(remote_script_path_); !remote_script.copy(local_job_location_ + "lsf\\" + scriptName)) {
         // throw exception
-        throw std::runtime_error("Could not copy the remote script " + remote_script_path_.toStdString() +
-                                 " to the local job location " + local_job_location_.toStdString() + " Error: " +
-                                 remote_script.errorString().toStdString());
+        throw FileCopyException(
+                "Could not copy the remote script " + remote_script_path_ + " to the local job location " +
+                local_job_location_);
     }
     qDebug() << "Copied the remote script " << remote_script_path_ << " to the local job location "
              << local_job_location_ + "lsf/" + scriptName;
 
     // Copy the remote launchers to the local job location
     if (QFile remote_launchers(remote_launchers_path_); !remote_launchers.copy(
-            local_job_location_ + "lsf/" + launcherName)) {
+            local_job_location_ + "lsf\\" + launcherName)) {
         // throw exception
-        throw std::runtime_error("Could not copy the remote launchers " + remote_launchers_path_.toStdString() +
-                                 " to the local job location " + local_job_location_.toStdString() + " Error: " +
-                                 remote_launchers.errorString().toStdString());
+        throw FileCopyException(
+                "Could not copy the remote launchers " + remote_launchers_path_ + " to the local job location " +
+                local_job_location_);
     }
     qDebug() << "Copied the remote launchers " << remote_launchers_path_ << " to the local job location "
              << local_job_location_ + "lsf/" + launcherName;
@@ -51,7 +52,7 @@ void BaseScript::replaceScriptParameters(const QString &scriptName, const QStrin
     QFile script_file(local_job_location_ + "lsf/" + scriptName);
     if (!script_file.open(QIODevice::ReadWrite | QIODevice::Text)) {
         // throw exception
-        throw std::runtime_error("Could not open the script file, error: " + script_file.errorString().toStdString());
+        throw FileOpenException("Could not open the script file " + script_file.fileName());
     }
 
     // Read the script file
@@ -73,7 +74,7 @@ void BaseScript::replaceScriptParameters(const QString &scriptName, const QStrin
     QFile launchers_file(local_job_location_ + "lsf/" + launcherName);
     if (!launchers_file.open(QIODevice::ReadWrite | QIODevice::Text)) {
         // throw exception
-        throw std::runtime_error("Could not open the launchers file");
+        throw FileOpenException("Could not open the launchers file " + launchers_file.fileName());
     }
 
     // Read the launchers file
@@ -103,7 +104,7 @@ void BaseScript::appendResubmissionJobExecutionLine(const QString &executionLine
     QFile script_file(local_job_location_ + "lsf/" + scriptName);
     if (!script_file.open(QIODevice::ReadWrite | QIODevice::Text)) {
         // throw exception
-        throw std::runtime_error("Could not open the script file, error: " + script_file.errorString().toStdString());
+        throw FileOpenException("Could not open the script file " + script_file.fileName());
     }
 
     // Read the script file
@@ -114,7 +115,7 @@ void BaseScript::appendResubmissionJobExecutionLine(const QString &executionLine
     QFile execution_line_file(executionLinePath);
     if (!execution_line_file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         // throw exception
-        throw std::runtime_error("Could not open the execution line file, error: " + execution_line_file.errorString().toStdString());
+        throw FileOpenException("Could not open the execution line file " + execution_line_file.fileName());
     }
 
     // Read the execution line file

@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "JobCreation.h++"
+#include "../exception/CustomErrors.h++"
 
 JobCreation::JobCreation(JobCreationWidget *job_creation_widget, QString configFilePath) : job_creation_widget_(
         job_creation_widget), config_file_path_(std::move(configFilePath)) {
@@ -40,7 +41,21 @@ void JobCreation::connectSignalsAndSlots() {
     });
 
     QAbstractButton::connect(job_creation_widget_->getExecutionPushButton(), &QAbstractButton::clicked, [this] {
-        createAndExecuteJob("50");
+        try {
+            createAndExecuteJob("50");
+        } catch (const FileCopyException &e) {
+            QMessageBox::critical(nullptr, "Job creation error", e.what());
+        } catch (const FileOpenException &e) {
+            QMessageBox::critical(nullptr, "Job creation error", e.what());
+        } catch (const ParcStyleException &e) {
+            QMessageBox::critical(nullptr, "Job creation error", e.what());
+        } catch (const BatchCalculationException &e) {
+            QMessageBox::critical(nullptr, "Job creation error", e.what());
+        } catch (const PathNotFoundException &e) {
+            QMessageBox::critical(nullptr, "Job creation error", e.what());
+        } catch (const NotRemoteDriveException &e) {
+            QMessageBox::critical(nullptr, "Job creation error", e.what());
+        }
     });
 }
 
@@ -115,7 +130,7 @@ QStringList JobCreation::getJobTypesFromConfigFile(const QString &configFilePath
     QStringList job_types;
     QFile file(configFilePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        throw std::runtime_error("Could not open file : " + configFilePath.toStdString());
+        throw FileOpenException("Could not open the file " + file.fileName());
     }
 
     QXmlStreamReader xmlReader(&file);
@@ -153,7 +168,7 @@ QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath,
     QStringList formats;
     QFile file(configFilePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        throw std::runtime_error("Could not open file : " + configFilePath.toStdString());
+        throw FileOpenException("Could not open the file " + file.fileName());
     }
 
     QXmlStreamReader xmlReader(&file);
@@ -403,7 +418,7 @@ QString JobCreation::getLastIndex() const {
         return job_creation_widget_->getSingleImageSpinBox()->text();
     } else if (job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
         if (job_creation_widget_->getBatchCalculationSpinBox()->value() == 0) {
-            throw std::invalid_argument("Batch calculation value cannot be 0");
+            throw BatchCalculationException("The batch calculation value cannot be 0");
         }
         int last_index = (job_creation_widget_->getLastImageSpinBox()->value() -
                           job_creation_widget_->getFirstImageSpinBox()->value()) /
@@ -478,7 +493,7 @@ QString JobCreation::getSubmissionOption() const {
     if (!parcStyleList.isEmpty()) {
         submissionOptions.append(parcStyleList);
     } else {
-        throw std::invalid_argument("No parc style selected");
+        throw ParcStyleException("No parc style selected");
     }
 
     return submissionOptions.join(" && ");
@@ -586,15 +601,11 @@ void JobCreation::createAndExecuteJob(QString priority) {
     QString remote_launchers_path = R"(I:\Mygale\Config_Blender_4_V2\lance.txt)";
 
     QString local_job_location = R"(I:\Mygale\TEMP\)" + job_.getJobName() + R"(\)";
-
-    qDebug() << "Remote script path : " << remote_script_path << " Remote launchers path : " << remote_launchers_path
-             << " Local job location : " << local_job_location;
     BaseScript script(job_, remote_script_path, remote_launchers_path, local_job_location);
     script.copyRemoteScript(job_.getJobName() + ".bat", "lance.bat");
     script.replaceScriptParameters(job_.getJobName() + ".bat", "lance.bat");
     QString output = script.executeScript("lance.bat");
 
-    qDebug() << "Output : " << output;
 
     if (job_creation_widget_->getAnalysisCheckBox()->isChecked()) {
         static QRegularExpression regex(R"(\d+)");
@@ -637,26 +648,28 @@ void JobCreation::createAndExecuteJob(QString priority) {
                     R"(I:\Mygale\Config_Blender_4_V2\resubmissionExecutionLine.txt)",
                     job_.getJobName() + "_Analysis.bat");
 
-            resubmission_script.replaceScriptParameters(job_.getJobName() + "_Resubmission.bat", "lanceResubmission.bat");
+            resubmission_script.replaceScriptParameters(job_.getJobName() + "_Resubmission.bat",
+                                                        "lanceResubmission.bat");
         }
 
         analysis_script.replaceScriptParameters(job_.getJobName() + "_Analysis.bat", "lanceAnalysis.bat");
         analysis_script.executeScript("lanceAnalysis.bat");
     }
+    QMessageBox::information(nullptr, "Job created", output);
 }
 
 QString JobCreation::convertToUncPath(const QString &path) {
     // Path = I:/Mygale/TEMP/JobName/
     QString uncPath = path;
     if (!QFileInfo::exists(path)) {
-        throw std::invalid_argument("The path does not exist");
+        throw PathNotFoundException("The path " + path + " does not exist");
     }
     QStorageInfo storageInfo(path);
     DWORD driveType = GetDriveType((LPCWSTR) storageInfo.rootPath().utf16());
     if (driveType == DRIVE_REMOTE) {
         return uncPath.replace("I:/", storageInfo.device()).replace("/", "\\");
     } else {
-        throw std::invalid_argument("The path is not a network path");
+        throw NotRemoteDriveException("The path " + path + " is not a remote drive");
     }
 }
 
