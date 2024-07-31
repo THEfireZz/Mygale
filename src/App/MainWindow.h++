@@ -6,6 +6,7 @@
 #define MYGALE_MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QCloseEvent>
 #include "../JobCreation/JobCreationWidget.h++"
 
 QT_BEGIN_NAMESPACE
@@ -26,6 +27,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+protected:
+    void closeEvent(QCloseEvent *event) override;
 };
 
 

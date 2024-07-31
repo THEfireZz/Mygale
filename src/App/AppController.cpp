@@ -7,6 +7,7 @@
 AppController::AppController(QObject *parent) : QObject(parent) {
 
 }
+
 /**
  * @class AppController
  * @brief This method initializes application and connects signals and slots
@@ -17,6 +18,8 @@ void AppController::initialize() {
     main_window_ = std::make_unique<MainWindow>();
     main_window_->show();
 
-    job_creation_ = std::make_unique<JobCreation>(main_window_->getJobCreationWidget(), R"(I:\Mygale\Config_Blender_4_V2\mainConfig.xml)");
+    job_creation_ = std::make_unique<JobCreation>(main_window_->getJobCreationWidget(),
+                                                  R"(I:\Mygale\Config_Blender_4_V2\mainConfig.xml)");
     job_creation_->initialize();
+    job_creation_->loadUserInput();
 }

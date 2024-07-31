@@ -23,6 +23,8 @@ public:
 
     void initialize();
 
+    void loadUserInput() const;
+
     Job createJob(QString priority);
 
     void createAndExecuteJob(QString priority);

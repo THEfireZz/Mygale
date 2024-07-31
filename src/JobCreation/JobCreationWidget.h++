@@ -32,6 +32,8 @@ public:
 
     void initialize();
 
+    void saveUserInput() const;
+
     //Ui getter
     [[nodiscard]] QRadioButton *getSingleImageRadioButton();
 
