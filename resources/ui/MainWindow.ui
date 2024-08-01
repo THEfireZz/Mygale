@@ -31,7 +31,7 @@
         <string>Mygale</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="configTab">
+      <widget class="AppSettingsWidget" name="appSettingsTab">
        <attribute name="title">
         <string>Config</string>
        </attribute>
@@ -46,6 +46,12 @@
    <class>JobCreationWidget</class>
    <extends>QWidget</extends>
    <header>C:\Users\sd43247\CLionProjects\Mygale\src\JobCreation\JobCreationWidget.h++</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AppSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>C:\Users\sd43247\CLionProjects\Mygale\src\AppSettings\AppSettingsWidget.h++</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

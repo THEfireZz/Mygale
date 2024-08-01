@@ -8,6 +8,7 @@
 #include <memory>
 #include "MainWindow.h++"
 #include "../JobCreation/JobCreation.h++"
+#include "../AppSettings/AppSettings.h++"
 
 
 class AppController : public QObject {
@@ -22,6 +23,7 @@ public:
 private:
     std::unique_ptr<MainWindow> main_window_;
     std::unique_ptr<JobCreation> job_creation_;
+    std::unique_ptr<AppSettings> app_settings_;
 };
 
 

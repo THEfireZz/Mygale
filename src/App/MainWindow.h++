@@ -8,6 +8,7 @@
 #include <QMainWindow>
 #include <QCloseEvent>
 #include "../JobCreation/JobCreationWidget.h++"
+#include "../AppSettings/AppSettingsWidget.h++"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,6 +25,8 @@ public:
     //Ui getter
 
     [[nodiscard]] JobCreationWidget *getJobCreationWidget() const;
+
+    [[nodiscard]] AppSettingsWidget *getAppSettingsWidget() const;
 
 private:
     Ui::MainWindow *ui;
