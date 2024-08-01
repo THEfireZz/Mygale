@@ -25,3 +25,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     ui->jobCreationTab->saveUserInput();
     event->accept();
 }
+
+AppSettingsWidget *MainWindow::getAppSettingsWidget() const {
+    return ui->appSettingsTab;
+}

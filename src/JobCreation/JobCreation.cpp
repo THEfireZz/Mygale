@@ -36,7 +36,8 @@ void JobCreation::loadUserInput() const {
     settings.beginGroup("JobCreationWidget");
 
     QStringList keys = settings.childKeys();
-    foreach (const QString &key, keys) {
+    foreach(
+    const QString &key, keys) {
         qDebug() << key << " : " << settings.value(key).toString();
     }
     for (QWidget *widget: job_creation_widget_->findChildren<QWidget *>()) {
@@ -157,7 +158,7 @@ void JobCreation::openOutputFolderDialog() {
  **/
 QStringList JobCreation::getJobTypesFromConfigFile(const QString &configFilePath) {
     QStringList job_types;
-    QFile file(configFilePath);
+    QFile file(configFilePath + "mainConfig.xml");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         throw FileOpenException("Could not open the file " + file.fileName());
     }
@@ -195,7 +196,7 @@ QStringList JobCreation::getJobTypesFromConfigFile(const QString &configFilePath
  **/
 QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath, const QString &jobType) {
     QStringList formats;
-    QFile file(configFilePath);
+    QFile file(configFilePath + "mainConfig.xml");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         throw FileOpenException("Could not open the file " + file.fileName());
     }
@@ -609,25 +610,25 @@ void JobCreation::createAndExecuteJob(QString priority) {
     QString remote_script_path;
     if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender") {
         if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Blender\Skeleton_Blender.txt)";
+            remote_script_path = config_file_path_ + R"(skeleton\Blender\Skeleton_Blender.txt)";
         } else {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Blender\Skeleton_Blender_MultipleImage.txt)";
+            remote_script_path = config_file_path_ + R"(skeleton\Blender\Skeleton_Blender_MultipleImage.txt)";
         }
     } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
         if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2023Vray.txt)";
+            remote_script_path = config_file_path_ + R"(skeleton\Maya\Skeleton_Maya_2023Vray.txt)";
         } else {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2023Vray_MultipleImage.txt)";
+            remote_script_path = config_file_path_ + R"(skeleton\Maya\Skeleton_Maya_2023Vray_MultipleImage.txt)";
         }
     } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred") {
         if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Vred\Skeleton_Vred.txt)";
+            remote_script_path = config_file_path_ + R"(skeleton\Vred\Skeleton_Vred.txt)";
         } else {
-            remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Vred\Skeleton_Vred_Resubmission.txt)";
+            remote_script_path = config_file_path_ + R"(skeleton\Vred\Skeleton_Vred_Resubmission.txt)";
         }
     }
 
-    QString remote_launchers_path = R"(I:\Mygale\Config_Blender_4_V2\lance.txt)";
+    QString remote_launchers_path = config_file_path_ + R"(lance.txt)";
 
     QString local_job_location = R"(I:\Mygale\TEMP\)" + job_.getJobName() + R"(\)";
     BaseScript script(job_, remote_script_path, remote_launchers_path, local_job_location);
@@ -640,8 +641,8 @@ void JobCreation::createAndExecuteJob(QString priority) {
         static QRegularExpression regex(R"(\d+)");
         job_.addJobParameter("<previousJobID>", regex.match(output).captured(0));
 
-        remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Skeleton_Analysis.txt)";
-        remote_launchers_path = R"(I:\Mygale\Config_Blender_4_V2\lanceAnalysis.txt)";
+        remote_script_path = config_file_path_ + R"(skeleton\Skeleton_Analysis.txt)";
+        remote_launchers_path = config_file_path_ + R"(lanceAnalysis.txt)";
         local_job_location = R"(I:\Mygale\TEMP\)" + job_.getJobName() + R"(\)";
 
         job_.addJobParameter("<jobName>", job_.getJobName());
@@ -655,14 +656,14 @@ void JobCreation::createAndExecuteJob(QString priority) {
 
         if (job_creation_widget_->getResubmissionCheckBox()->isChecked()) {
             if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender") {
-                remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Blender\Skeleton_Blender_Resubmission.txt)";
+                remote_script_path = config_file_path_ + R"(skeleton\Blender\Skeleton_Blender_Resubmission.txt)";
             } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
-                remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Maya\Skeleton_Maya_2023Vray_Resubmission.txt)";
+                remote_script_path = config_file_path_ + R"(skeleton\Maya\Skeleton_Maya_2023Vray_Resubmission.txt)";
             } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred") {
-                remote_script_path = R"(I:\Mygale\Config_Blender_4_V2\skeleton\Vred\Skeleton_Vred_Resubmission.txt)";
+                remote_script_path = config_file_path_ + R"(skeleton\Vred\Skeleton_Vred_Resubmission.txt)";
             }
 
-            remote_launchers_path = R"(I:\Mygale\Config_Blender_4_V2\lanceResubmission.txt)";
+            remote_launchers_path = config_file_path_ + R"(lanceResubmission.txt)";
             local_job_location = R"(I:\Mygale\TEMP\)" + job_.getJobName() + R"(\)";
 
             job_.addJobParameter("<jobName>", job_.getJobName());
@@ -674,7 +675,7 @@ void JobCreation::createAndExecuteJob(QString priority) {
             BaseScript resubmission_script(job_, remote_script_path, remote_launchers_path, local_job_location);
             resubmission_script.copyRemoteScript(job_.getJobName() + "_Resubmission.bat", "lanceResubmission.bat");
             resubmission_script.appendResubmissionJobExecutionLine(
-                    R"(I:\Mygale\Config_Blender_4_V2\resubmissionExecutionLine.txt)",
+                    config_file_path_ + R"(resubmissionExecutionLine.txt)",
                     job_.getJobName() + "_Analysis.bat");
 
             resubmission_script.replaceScriptParameters(job_.getJobName() + "_Resubmission.bat",

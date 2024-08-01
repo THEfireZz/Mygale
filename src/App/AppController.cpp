@@ -4,7 +4,9 @@
 
 #include "AppController.h++"
 
-AppController::AppController(QObject *parent) : QObject(parent) {
+AppController::AppController(QObject * parent)
+:
+QObject(parent) {
 
 }
 
@@ -17,9 +19,10 @@ void AppController::initialize() {
 
     main_window_ = std::make_unique<MainWindow>();
     main_window_->show();
-
+    app_settings_ = std::make_unique<AppSettings>(main_window_->getAppSettingsWidget());
+    app_settings_->initialize();
     job_creation_ = std::make_unique<JobCreation>(main_window_->getJobCreationWidget(),
-                                                  R"(I:\Mygale\Config_Blender_4_V2\mainConfig.xml)");
+                                                  app_settings_->getLocalConfigLocation());
     job_creation_->initialize();
     job_creation_->loadUserInput();
 }

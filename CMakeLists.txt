@@ -23,6 +23,8 @@ set(SOURCES
         src/JobCreation/JobCreation.cpp
         src/JobCreation/Job.cpp
         src/Script/BaseScript.cpp
+        src/AppSettings/AppSettings.cpp
+        src/AppSettings/AppSettings.h++
 )
 
 #add the header files
@@ -40,6 +42,9 @@ set(HEADERS
 set(UIS
         resources/ui/MainWindow.ui
         resources/ui/JobCreationWidget.ui
+        src/AppSettings/AppSettingsWidget.cpp
+        src/AppSettings/AppSettingsWidget.h++
+        resources/ui/AppSettingsWidget.ui
 )
 
 add_executable(Mygale
