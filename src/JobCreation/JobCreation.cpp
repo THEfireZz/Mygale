@@ -36,10 +36,6 @@ void JobCreation::loadUserInput() const {
     settings.beginGroup("JobCreationWidget");
 
     QStringList keys = settings.childKeys();
-    foreach(
-    const QString &key, keys) {
-        qDebug() << key << " : " << settings.value(key).toString();
-    }
     for (QWidget *widget: job_creation_widget_->findChildren<QWidget *>()) {
         const QString objectName = widget->objectName();
         if (keys.contains(objectName)) {
@@ -226,6 +222,43 @@ QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath,
 
     file.close();
     return formats;
+}
+
+QString JobCreation::getJobParameterValueFromConfigFile(const QString &configFilePath, const QString &jobType,
+                                                        const QString &parameter) {
+    QString value;
+
+    QFile file(configFilePath + "mainConfig.xml");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        throw FileOpenException("Could not open the file " + file.fileName());
+    }
+
+    QXmlStreamReader xmlReader(&file);
+
+    while (!xmlReader.atEnd() && !xmlReader.hasError()) {
+        xmlReader.readNext();
+        if (xmlReader.isStartElement() && xmlReader.name().toString() == "Option") {
+            QString currentJobType;
+            while (xmlReader.readNextStartElement()) {
+                if (xmlReader.name().toString() == "name") {
+                    currentJobType = xmlReader.readElementText();
+                } else if (!currentJobType.isEmpty() && currentJobType == jobType) {
+                    if (xmlReader.name() == parameter) {
+                        value = xmlReader.readElementText();
+                        file.close();
+                        return value;
+                    } else {
+                        xmlReader.skipCurrentElement();
+                    }
+                } else {
+                    xmlReader.skipCurrentElement();
+                }
+            }
+        }
+    }
+
+    file.close();
+    return value;
 }
 
 /**
@@ -606,26 +639,15 @@ QString JobCreation::getSteps() {
 void JobCreation::createAndExecuteJob(QString priority) {
     createJob(std::move(priority));
     qDebug() << "Job created : " << job_.getJobName();
-
+    qDebug() << "Job type : " << job_.getJobType();
+    QString jobType = job_.getJobType();
     QString remote_script_path;
-    if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender") {
-        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
-            remote_script_path = config_file_path_ + R"(skeleton\Blender\Skeleton_Blender.txt)";
-        } else {
-            remote_script_path = config_file_path_ + R"(skeleton\Blender\Skeleton_Blender_MultipleImage.txt)";
-        }
-    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
-        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
-            remote_script_path = config_file_path_ + R"(skeleton\Maya\Skeleton_Maya_2023Vray.txt)";
-        } else {
-            remote_script_path = config_file_path_ + R"(skeleton\Maya\Skeleton_Maya_2023Vray_MultipleImage.txt)";
-        }
-    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred") {
-        if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
-            remote_script_path = config_file_path_ + R"(skeleton\Vred\Skeleton_Vred.txt)";
-        } else {
-            remote_script_path = config_file_path_ + R"(skeleton\Vred\Skeleton_Vred_Resubmission.txt)";
-        }
+    if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
+        remote_script_path =
+                config_file_path_ + getJobParameterValueFromConfigFile(config_file_path_, jobType, "skeleton");
+    } else {
+        remote_script_path = config_file_path_ +
+                             getJobParameterValueFromConfigFile(config_file_path_, jobType, "skeletonMultipleImage");
     }
 
     QString remote_launchers_path = config_file_path_ + R"(lance.txt)";
@@ -655,23 +677,13 @@ void JobCreation::createAndExecuteJob(QString priority) {
         analysis_script.copyRemoteScript(job_.getJobName() + "_Analysis.bat", "lanceAnalysis.bat");
 
         if (job_creation_widget_->getResubmissionCheckBox()->isChecked()) {
-            if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender") {
-                remote_script_path = config_file_path_ + R"(skeleton\Blender\Skeleton_Blender_Resubmission.txt)";
-            } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
-                remote_script_path = config_file_path_ + R"(skeleton\Maya\Skeleton_Maya_2023Vray_Resubmission.txt)";
-            } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Vred") {
-                remote_script_path = config_file_path_ + R"(skeleton\Vred\Skeleton_Vred_Resubmission.txt)";
-            }
+            remote_script_path = config_file_path_ +
+                                 getJobParameterValueFromConfigFile(config_file_path_, job_.getJobType(),
+                                                                    "skeletonResubmission");
 
             remote_launchers_path = config_file_path_ + R"(lanceResubmission.txt)";
             local_job_location = R"(I:\Mygale\TEMP\)" + job_.getJobName() + R"(\)";
-
             job_.addJobParameter("<jobName>", job_.getJobName());
-
-            qDebug() << "Remote script path : " << remote_script_path << " Remote launchers path : "
-                     << remote_launchers_path
-                     << " Local job location : " << local_job_location;
-
             BaseScript resubmission_script(job_, remote_script_path, remote_launchers_path, local_job_location);
             resubmission_script.copyRemoteScript(job_.getJobName() + "_Resubmission.bat", "lanceResubmission.bat");
             resubmission_script.appendResubmissionJobExecutionLine(

@@ -46,6 +46,8 @@ private:
 
     static QStringList getFormatsFromConfigFile(const QString &configFilePath, const QString &jobType);
 
+    static QString getJobParameterValueFromConfigFile(const QString &configFilePath, const QString &jobType, const QString &parameter);
+
     static QString convertToUncPath(const QString &path);
 
     [[nodiscard]] QString getJobType() const;
