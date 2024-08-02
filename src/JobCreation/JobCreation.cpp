@@ -29,8 +29,6 @@ void JobCreation::initialize() {
 }
 
 void JobCreation::loadUserInput() const {
-    qDebug() << "Loading user input";
-
     QSettings settings("Stellantis", "Mygale");
     settings.beginGroup("MainWindow");
     settings.beginGroup("JobCreationWidget");
@@ -274,6 +272,7 @@ Job JobCreation::createJob(QString priority) {
     QString scene_path = getScenePath();
     QString output_path = getOutputPath();
     QString name = getName();
+    qDebug() << "Name : " << name;
     QString format = getFormat();
     QString raw_format = getRawFormat(job_creation_widget_->getImagesFormatComboBox()->currentText());
     QString first_image = getFirstImage();
@@ -365,7 +364,7 @@ QString JobCreation::getName() {
         prefix = "-im ";
     }
     if (job_creation_widget_->getImagesNameCheckBox()->isChecked()) {
-        return prefix + job_creation_widget_->getJobNameLineEdit()->text();
+        return prefix + job_creation_widget_->getImagesNameLineEdit()->text();
     }
     return {};
 
@@ -639,7 +638,6 @@ QString JobCreation::getSteps() {
 void JobCreation::createAndExecuteJob(QString priority) {
     createJob(std::move(priority));
     qDebug() << "Job created : " << job_.getJobName();
-    qDebug() << "Job type : " << job_.getJobType();
     QString jobType = job_.getJobType();
     QString remote_script_path;
     if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
