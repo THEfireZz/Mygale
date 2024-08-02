@@ -31,8 +31,6 @@ BaseScript::copyRemoteScript(const QString &scriptName, const QString &launcherN
                 "Could not copy the remote script " + remote_script_path_ + " to the local job location " +
                 local_job_location_);
     }
-    qDebug() << "Copied the remote script " << remote_script_path_ << " to the local job location "
-             << local_job_location_ + "lsf/" + scriptName;
 
     // Copy the remote launchers to the local job location
     if (QFile remote_launchers(remote_launchers_path_); !remote_launchers.copy(
@@ -42,8 +40,6 @@ BaseScript::copyRemoteScript(const QString &scriptName, const QString &launcherN
                 "Could not copy the remote launchers " + remote_launchers_path_ + " to the local job location " +
                 local_job_location_);
     }
-    qDebug() << "Copied the remote launchers " << remote_launchers_path_ << " to the local job location "
-             << local_job_location_ + "lsf/" + launcherName;
 
 }
 
@@ -136,8 +132,7 @@ QString BaseScript::executeScript(const QString &scriptName) const {
     QProcess process;
     process.setWorkingDirectory(local_job_location_ + "lsf");
 
-    QString fullScriptPath = local_job_location_ + "lsf/" + scriptName;
-    qDebug() << "Executing script: " << fullScriptPath;
+    QString fullScriptPath = local_job_location_ + "lsf\\" + scriptName;
 
     process.start("cmd.exe", QStringList() << "/c" << fullScriptPath);
     process.waitForFinished(-1);
