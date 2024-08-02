@@ -359,12 +359,11 @@ QString JobCreation::getOutputPath() const {
  * @return the name
  **/
 QString JobCreation::getName() {
-    QString prefix = "";
-    if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
-        prefix = "-im ";
-    }
+    QString xmlPrefix = getJobParameterValueFromConfigFile(config_file_path_,
+                                                           job_creation_widget_->getJobTypeComboBox()->currentText(),
+                                                           "NameOption");
     if (job_creation_widget_->getImagesNameCheckBox()->isChecked()) {
-        return prefix + job_creation_widget_->getImagesNameLineEdit()->text();
+        return xmlPrefix + job_creation_widget_->getImagesNameLineEdit()->text();
     }
     return {};
 
@@ -377,12 +376,9 @@ QString JobCreation::getName() {
  * @return the format
  **/
 QString JobCreation::getFormat() const {
-    QString prefix = "";
-    if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Blender") {
-        prefix = "-F ";
-    } else if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
-        prefix = "-of ";
-    }
+    QString xmlPrefix = getJobParameterValueFromConfigFile(config_file_path_,
+                                                           job_creation_widget_->getJobTypeComboBox()->currentText(),
+                                                           "FormatOption");
     if (job_creation_widget_->getImagesFormatCheckBox()->isChecked()) {
         QString selection = job_creation_widget_->getImagesFormatComboBox()->currentText();
         QString result;
@@ -391,7 +387,7 @@ QString JobCreation::getFormat() const {
         } else {
             result = getFormatName(selection);
         }
-        return prefix + result;
+        return xmlPrefix + result;
     }
     return {};
 }
@@ -497,12 +493,11 @@ QString JobCreation::getLastIndex() const {
  * @return the camera name
  **/
 QString JobCreation::getCameraName() const {
-    QString prefix = "";
-    if (job_creation_widget_->getJobTypeComboBox()->currentText() == "Maya_2023/Vray") {
-        prefix = "-cam ";
-    }
+    QString xmlPrefix = getJobParameterValueFromConfigFile(config_file_path_,
+                                                           job_creation_widget_->getJobTypeComboBox()->currentText(),
+                                                           "CameraOption");
     if (job_creation_widget_->getCameraGroupBox()->isChecked()) {
-        return job_creation_widget_->getCameraLineEdit()->text();
+        return xmlPrefix + job_creation_widget_->getCameraLineEdit()->text();
     }
     return {};
 }
