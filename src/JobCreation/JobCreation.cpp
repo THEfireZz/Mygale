@@ -478,10 +478,10 @@ QString JobCreation::getLastIndex() const {
         if (job_creation_widget_->getBatchCalculationSpinBox()->value() == 0) {
             throw BatchCalculationException("The batch calculation value cannot be 0");
         }
-        int last_index = (job_creation_widget_->getLastImageSpinBox()->value() -
-                          job_creation_widget_->getFirstImageSpinBox()->value()) /
-                         job_creation_widget_->getBatchCalculationSpinBox()->value();
-        return QString::number(last_index);
+        int batch_size = job_creation_widget_->getBatchCalculationSpinBox()->value();
+        int total_images = job_creation_widget_->getLastImageSpinBox()->value() - job_creation_widget_->getFirstImageSpinBox()->value() + 1;
+        int last_batch_index  = (total_images + batch_size - 1) / batch_size;
+        return QString::number(last_batch_index);
     }
     return job_creation_widget_->getLastImageSpinBox()->text();
 }
