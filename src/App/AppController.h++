@@ -8,6 +8,7 @@
 #include <memory>
 #include <QDirIterator>
 #include <QObject>
+#include <QDir>
 #include "MainWindow.h++"
 #include "../JobCreation/JobCreation.h++"
 #include "../AppSettings/AppSettings.h++"
