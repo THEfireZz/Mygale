@@ -5,7 +5,9 @@
 #ifndef MYGALE_APPSETTINGS_H
 #define MYGALE_APPSETTINGS_H
 
-
+#include <QFileDialog>
+#include <QToolButton>
+#include <QAbstractButton>
 #include "AppSettingsWidget.h++"
 
 class AppSettings {
@@ -14,7 +16,7 @@ public:
 
     ~AppSettings() = default;
 
-    void initialize();
+    void connectSignalsAndSlots();
 
     [[nodiscard]] QString getRemoteConfigLocation() const;
 
@@ -23,9 +25,9 @@ public:
 private:
     AppSettingsWidget *app_settings_widget_;
 
+    void openRemoteConfigFileDialog();
 
-
-    void connectSignalsAndSlots();
+    void openLocalConfigFileDialog();
 };
 
 

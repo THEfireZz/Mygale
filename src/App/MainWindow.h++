@@ -28,6 +28,8 @@ public:
 
     [[nodiscard]] AppSettingsWidget *getAppSettingsWidget() const;
 
+    [[nodiscard]] QTabWidget *getTabWidget() const;
+
 private:
     Ui::MainWindow *ui;
 protected:

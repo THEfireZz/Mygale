@@ -6,9 +6,12 @@
 #define MYGALE_APPCONTROLLER_H
 
 #include <memory>
+#include <QDirIterator>
+#include <QObject>
 #include "MainWindow.h++"
 #include "../JobCreation/JobCreation.h++"
 #include "../AppSettings/AppSettings.h++"
+#include "../exception/CustomErrors.h++"
 
 
 class AppController : public QObject {
@@ -20,10 +23,16 @@ public:
 
     void initialize();
 
+    void connectSignalsAndSlots();
+
 private:
     std::unique_ptr<MainWindow> main_window_;
     std::unique_ptr<JobCreation> job_creation_;
     std::unique_ptr<AppSettings> app_settings_;
+
+    static void copyRemoteConfigFolderToLocal(const QString& remoteConfigFolder, const QString& localConfigFolder) ;
+
+    void currentTabChanged(int index);
 };
 
 

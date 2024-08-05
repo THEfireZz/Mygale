@@ -18,7 +18,6 @@ JobCreation::JobCreation(JobCreationWidget *job_creation_widget, QString configF
  **/
 void JobCreation::initialize() {
     job_creation_widget_->initialize();
-    connectSignalsAndSlots();
 
     QStringList job_types = getJobTypesFromConfigFile(config_file_path_);
     job_creation_widget_->getJobTypeComboBox()->addItems(job_types);
@@ -81,6 +80,32 @@ void JobCreation::connectSignalsAndSlots() {
             QMessageBox::critical(nullptr, "Job creation error", e.what());
         }
     });
+
+
+    //Handle elements enable/disable
+    QAbstractButton::connect(job_creation_widget_->getSingleImageRadioButton(), &QRadioButton::toggled,
+            [this](bool checked) { job_creation_widget_->singleImageRadioButtonToggled(checked); });
+
+    QAbstractButton::connect(job_creation_widget_->getMultipleImagesRadioButton(), &QRadioButton::toggled,
+            [this](bool checked) { job_creation_widget_->multipleImagesRadioButtonToggled(checked); });
+
+    QAbstractButton::connect(job_creation_widget_->getBatchCalculationCheckBox(), &QCheckBox::toggled,
+            [this](bool checked) { job_creation_widget_->batchCalculationCheckBoxToggled(checked); });
+
+    QAbstractButton::connect(job_creation_widget_->getImagesNameCheckBox(), &QCheckBox::toggled,
+            [this](bool checked) { job_creation_widget_->imagesNameCheckBoxToggled(checked); });
+
+    QAbstractButton::connect(job_creation_widget_->getImagesFormatCheckBox(), &QCheckBox::toggled,
+            [this](bool checked) { job_creation_widget_->imagesFormatCheckBoxToggled(checked); });
+
+    QAbstractButton::connect(job_creation_widget_->getCpuCheckBox(), &QCheckBox::toggled,
+            [this](bool checked) { job_creation_widget_->cpuCheckBoxToggled(checked); });
+
+    QAbstractButton::connect(job_creation_widget_->getMemoryCheckBox(), &QCheckBox::toggled,
+            [this](bool checked) { job_creation_widget_->memoryCheckBoxToggled(checked); });
+
+    QAbstractButton::connect(job_creation_widget_->getAnalysisCheckBox(), &QCheckBox::toggled,
+            [this](bool checked) { job_creation_widget_->analysisCheckBoxToggled(checked); });
 }
 
 /**

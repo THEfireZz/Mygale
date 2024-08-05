@@ -67,38 +67,7 @@ QSpinBox *JobCreationWidget::getBatchCalculationSpinBox() {
 }
 
 void JobCreationWidget::initialize() {
-    connectSignalsAndSlots();
     loadPcPoolManagmentChoice();
-}
-
-void JobCreationWidget::connectSignalsAndSlots() {
-
-    //Handle elements enable/disable
-    connect(getSingleImageRadioButton(), &QRadioButton::toggled,
-            [this](bool checked) { singleImageRadioButtonToggled(checked); });
-
-    connect(getMultipleImagesRadioButton(), &QRadioButton::toggled,
-            [this](bool checked) { multipleImagesRadioButtonToggled(checked); });
-
-    connect(getBatchCalculationCheckBox(), &QCheckBox::toggled,
-            [this](bool checked) { batchCalculationCheckBoxToggled(checked); });
-
-    connect(getImagesNameCheckBox(), &QCheckBox::toggled,
-            [this](bool checked) { imagesNameCheckBoxToggled(checked); });
-
-    connect(getImagesFormatCheckBox(), &QCheckBox::toggled,
-            [this](bool checked) { imagesFormatCheckBoxToggled(checked); });
-
-    connect(getCpuCheckBox(), &QCheckBox::toggled,
-            [this](bool checked) { cpuCheckBoxToggled(checked); });
-
-    connect(getMemoryCheckBox(), &QCheckBox::toggled,
-            [this](bool checked) { memoryCheckBoxToggled(checked); });
-
-    connect(getAnalysisCheckBox(), &QCheckBox::toggled,
-            [this](bool checked) { analysisCheckBoxToggled(checked); });
-
-    connect(this, &JobCreationWidget::close, this, &JobCreationWidget::saveUserInput);
 }
 
 void JobCreationWidget::loadPcPoolManagmentChoice() {

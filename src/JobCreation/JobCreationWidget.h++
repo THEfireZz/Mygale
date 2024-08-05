@@ -110,14 +110,7 @@ public:
     [[nodiscard]] QGridLayout * getPcPoolManagementGridLayout();
 
 
-
-
-
-private:
-    Ui::JobCreationWidget *ui;
-
-    void connectSignalsAndSlots();
-
+    //
     void singleImageRadioButtonToggled(bool checked);
 
     void multipleImagesRadioButtonToggled(bool checked);
@@ -134,6 +127,11 @@ private:
 
     void analysisCheckBoxToggled(bool checked);
 
+
+
+
+private:
+    Ui::JobCreationWidget *ui;
 
     void loadPcPoolManagmentChoice();
 };

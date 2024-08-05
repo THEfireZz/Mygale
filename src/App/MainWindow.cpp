@@ -29,3 +29,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 AppSettingsWidget *MainWindow::getAppSettingsWidget() const {
     return ui->appSettingsTab;
 }
+
+QTabWidget *MainWindow::getTabWidget() const {
+    return ui->tabWidget;
+}
