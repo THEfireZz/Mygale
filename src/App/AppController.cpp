@@ -55,8 +55,12 @@ void AppController::connectSignalsAndSlots() {
 
 void AppController::copyRemoteConfigFolderToLocal(const QString &remoteConfigFolder, const QString &localConfigFolder) {
     qDebug() << "Copying remote config folder to local config folder";
-    if (!QDir(remoteConfigFolder).exists() || !QDir(localConfigFolder).exists()) {
-        throw PathNotFoundException("One of the config folders does not exist");
+    if (!QDir(remoteConfigFolder).exists()) {
+        throw PathNotFoundException(QString("Remote config folder '%1' does not exist").arg(remoteConfigFolder));
+    }
+    //make local config folder if it doesn't exist
+    if (!QDir().mkpath(localConfigFolder)) {
+        throw PathNotFoundException(QString("Failed to create local folder '%1'").arg(localConfigFolder));
     }
 
     if (remoteConfigFolder.isEmpty() || localConfigFolder.isEmpty()) {
@@ -96,6 +100,18 @@ void AppController::copyRemoteConfigFolderToLocal(const QString &remoteConfigFol
 
 void AppController::currentTabChanged(int index) {
     if (index == 0) {
+        try {
+            copyRemoteConfigFolderToLocal(app_settings_->getRemoteConfigLocation(),
+                                          app_settings_->getLocalConfigLocation());
+        } catch (const PathNotFoundException &e) {
+            main_window_->getTabWidget()->setCurrentIndex(1);
+            QMessageBox::warning(main_window_.get(), "Config folder error", e.what());
+            return;
+        } catch (const FileCopyException &e) {
+            qCritical() << e.what();
+            return;
+        }
+
         job_creation_->initialize();
         job_creation_->loadUserInput();
     }
