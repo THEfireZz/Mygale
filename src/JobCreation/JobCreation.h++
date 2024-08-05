@@ -23,6 +23,8 @@ public:
 
     void initialize();
 
+    void connectSignalsAndSlots();
+
     void loadUserInput() const;
 
     Job createJob(QString priority);
@@ -33,8 +35,6 @@ private:
     JobCreationWidget *job_creation_widget_;
     QString config_file_path_;
     Job job_ = Job::Builder().build();
-
-    void connectSignalsAndSlots();
 
     void incrementJobNumber();
 

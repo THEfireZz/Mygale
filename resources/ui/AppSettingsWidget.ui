@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>140</height>
+    <height>146</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,11 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QLineEdit" name="remoteLocationLineEdit"/>
+       <widget class="QLineEdit" name="remoteLocationLineEdit">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QToolButton" name="remoteLocationToolButton">
@@ -42,7 +46,7 @@
       <item>
        <widget class="QLineEdit" name="localLocationLineEdit">
         <property name="text">
-         <string>I:\Mygale\Config_Blender_4_V2\</string>
+         <string>I:\Mygale\Config_V2\</string>
         </property>
        </widget>
       </item>
