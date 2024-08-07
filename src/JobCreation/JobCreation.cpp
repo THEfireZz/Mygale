@@ -192,25 +192,21 @@ QStringList JobCreation::getJobTypesFromConfigFile(const QString &configFilePath
     }
 
     QXmlStreamReader xmlReader(&file);
-
     while (!xmlReader.atEnd() && !xmlReader.hasError()) {
         xmlReader.readNext();
-        if (!xmlReader.isStartElement() || xmlReader.name().toString() != "Option") {
-            continue;
-        }
 
-        while (xmlReader.readNextStartElement()) {
-            if (xmlReader.name().toString() == "name") {
-                job_types.append(xmlReader.readElementText());
-            } else {
-                xmlReader.skipCurrentElement();
-            }
+        if (xmlReader.isStartElement() && xmlReader.name().toString() == "name") {
+            QString job_type = xmlReader.readElementText();
+            job_types.append(job_type);
         }
+    }
+
+    if (xmlReader.hasError()) {
+        throw XmlParseException("Error parsing XML: " + xmlReader.errorString());
     }
 
     file.close();
     return job_types;
-
 }
 
 /**
@@ -265,35 +261,39 @@ QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath,
 
 QString JobCreation::getJobParameterValueFromConfigFile(const QString &configFilePath, const QString &jobType,
                                                         const QString &parameter) {
-    QString value;
-
     QFile file(configFilePath + "mainConfig.xml");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         throw FileOpenException("Could not open the file " + file.fileName());
     }
 
     QXmlStreamReader xmlReader(&file);
+    QString currentJobType;
+    QString value;
 
     while (!xmlReader.atEnd() && !xmlReader.hasError()) {
         xmlReader.readNext();
+
         if (xmlReader.isStartElement() && xmlReader.name().toString() == "Option") {
-            QString currentJobType;
-            while (xmlReader.readNextStartElement()) {
-                if (xmlReader.name().toString() == "name") {
-                    currentJobType = xmlReader.readElementText();
-                } else if (!currentJobType.isEmpty() && currentJobType == jobType) {
-                    if (xmlReader.name() == parameter) {
-                        value = xmlReader.readElementText();
-                        file.close();
-                        return value;
-                    } else {
-                        xmlReader.skipCurrentElement();
-                    }
-                } else {
-                    xmlReader.skipCurrentElement();
-                }
+            currentJobType.clear();  // Reset the current job type for each Option block
+        }
+
+        if (xmlReader.isStartElement() && xmlReader.name().toString() == "name") {
+            currentJobType = xmlReader.readElementText();
+        }
+
+        if (!currentJobType.isEmpty() && currentJobType == jobType) {
+            if (xmlReader.isStartElement() && xmlReader.name() == parameter) {
+                value = xmlReader.readElementText();
             }
         }
+
+        if (xmlReader.isEndElement() && xmlReader.name().toString() == "Option") {
+            currentJobType.clear();  // Reset the current job type after exiting an Option block
+        }
+    }
+
+    if (xmlReader.hasError()) {
+        throw XmlParseException("Error parsing XML: " + xmlReader.errorString());
     }
 
     file.close();

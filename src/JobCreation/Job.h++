@@ -8,6 +8,7 @@
 #include <QHash>
 #include <QString>
 #include <QDebug>
+#include "../exception/CustomErrors.h++"
 
 class Job {
 private:
