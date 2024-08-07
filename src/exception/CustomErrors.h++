@@ -87,4 +87,15 @@ public:
     }
 };
 
+class MissingRequiredParameterException : public std::exception {
+private:
+    const QString message_;
+public:
+    explicit MissingRequiredParameterException(QString message) : message_(std::move(message)) {}
+
+    [[nodiscard]] const char *what() const noexcept override {
+        return message_.toStdString().c_str();
+    }
+};
+
 #endif //MYGALE_CUSTOMERRORS_H
