@@ -3,8 +3,11 @@
 //
 
 #include <utility>
+#include <QXmlStreamReader>
+#include <qfile.h>
 
 #include "Job.h++"
+#include "../exception/CustomErrors.h++"
 
 QString Job::getJobName() const {
     return job_name_;
@@ -24,6 +27,54 @@ void Job::addJobParameter(const QString &key, const QString &value) {
 
 void Job::setJobName(QString newJobName) {
     job_name_ = std::move(newJobName);
+}
+
+void Job::checkRequiredParameters(const QString &configPath) const {
+    QFile file(configPath + "mainConfig.xml");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        throw FileOpenException("Could not open the file " + file.fileName());
+    }
+
+    QXmlStreamReader xmlReader(&file);
+
+    while (!xmlReader.atEnd() && !xmlReader.hasError()) {
+        xmlReader.readNext();
+        if (!xmlReader.isStartElement() || xmlReader.name().toString() != "Option") {
+            continue;
+        }
+
+        while (!xmlReader.atEnd() && !xmlReader.hasError()) {
+            xmlReader.readNext();
+            if (xmlReader.isStartElement() && xmlReader.name().toString() == "Option") {
+                QString currentJobType;
+                while (xmlReader.readNextStartElement()) {
+                    if (xmlReader.name().toString() == "name") {
+                        currentJobType = xmlReader.readElementText();
+                    } else if (!currentJobType.isEmpty() && currentJobType == job_type_) {
+                        if (xmlReader.name().toString() == "Required") {
+                            while (xmlReader.readNextStartElement()) {
+                                if (xmlReader.name().toString() == "option") {
+                                    QString requiredOption = xmlReader.readElementText();
+                                    if (!job_parameters_.contains('<' + requiredOption + '>') ||
+                                        job_parameters_.value('<' + requiredOption + '>').isEmpty()) {
+                                        throw MissingRequiredParameterException(
+                                                "The parameter " + requiredOption + " is required for the job type " +
+                                                job_type_);
+                                    }
+                                } else {
+                                    xmlReader.skipCurrentElement();
+                                }
+                            }
+                        } else {
+                            xmlReader.skipCurrentElement();
+                        }
+                    } else {
+                        xmlReader.skipCurrentElement();
+                    }
+                }
+            }
+        }
+    }
 }
 
 /**

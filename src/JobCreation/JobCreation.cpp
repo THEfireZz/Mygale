@@ -78,6 +78,8 @@ void JobCreation::connectSignalsAndSlots() {
             QMessageBox::critical(nullptr, "Job creation error", e.what());
         } catch (const NotRemoteDriveException &e) {
             QMessageBox::critical(nullptr, "Job creation error", e.what());
+        } catch (const MissingRequiredParameterException &e) {
+            QMessageBox::critical(nullptr, "Job creation error", e.what());
         }
     });
 
@@ -299,6 +301,7 @@ Job JobCreation::createJob(QString priority) {
     QString name = getName();
     qDebug() << "Name : " << name;
     QString format = getFormat();
+    qDebug() << "Format : " << format;
     QString raw_format = getRawFormat(job_creation_widget_->getImagesFormatComboBox()->currentText());
     QString first_image = getFirstImage();
     QString last_image = getLastImage();
@@ -334,6 +337,7 @@ Job JobCreation::createJob(QString priority) {
             })
             .build();
 
+    job_.checkRequiredParameters(config_file_path_);
     return job_;
 }
 

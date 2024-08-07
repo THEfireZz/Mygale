@@ -7,6 +7,7 @@
 
 #include <QHash>
 #include <QString>
+#include <QDebug>
 
 class Job {
 private:
@@ -25,6 +26,8 @@ public:
     [[nodiscard]] QHash<QString, QString> getJobParameters() const;
 
     void addJobParameter(const QString &key, const QString &value);
+
+    void checkRequiredParameters(const QString& configPath) const;
 
     class Builder {
     private:
