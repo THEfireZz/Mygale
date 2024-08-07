@@ -20,10 +20,12 @@ void JobCreation::initialize() {
     job_creation_widget_->initialize();
 
     QStringList job_types = getJobTypesFromConfigFile(config_file_path_);
+    job_creation_widget_->getJobTypeComboBox()->clear();
     job_creation_widget_->getJobTypeComboBox()->addItems(job_types);
 
     QStringList formats = getFormatsFromConfigFile(config_file_path_,
                                                    job_creation_widget_->getJobTypeComboBox()->currentText());
+    job_creation_widget_->getImagesFormatComboBox()->clear();
     job_creation_widget_->getImagesFormatComboBox()->addItems(formats);
 }
 
@@ -63,6 +65,11 @@ void JobCreation::connectSignalsAndSlots() {
         openOutputFolderDialog();
     });
 
+    QComboBox::connect(job_creation_widget_->getJobTypeComboBox(), &QComboBox::currentTextChanged,
+                       [this](const QString &jobType) {
+                           updateFormatComboBox(jobType);
+                       });
+
     QAbstractButton::connect(job_creation_widget_->getExecutionPushButton(), &QAbstractButton::clicked, [this] {
         try {
             createAndExecuteJob("50");
@@ -86,28 +93,28 @@ void JobCreation::connectSignalsAndSlots() {
 
     //Handle elements enable/disable
     QAbstractButton::connect(job_creation_widget_->getSingleImageRadioButton(), &QRadioButton::toggled,
-            [this](bool checked) { job_creation_widget_->singleImageRadioButtonToggled(checked); });
+                             [this](bool checked) { job_creation_widget_->singleImageRadioButtonToggled(checked); });
 
     QAbstractButton::connect(job_creation_widget_->getMultipleImagesRadioButton(), &QRadioButton::toggled,
-            [this](bool checked) { job_creation_widget_->multipleImagesRadioButtonToggled(checked); });
+                             [this](bool checked) { job_creation_widget_->multipleImagesRadioButtonToggled(checked); });
 
     QAbstractButton::connect(job_creation_widget_->getBatchCalculationCheckBox(), &QCheckBox::toggled,
-            [this](bool checked) { job_creation_widget_->batchCalculationCheckBoxToggled(checked); });
+                             [this](bool checked) { job_creation_widget_->batchCalculationCheckBoxToggled(checked); });
 
     QAbstractButton::connect(job_creation_widget_->getImagesNameCheckBox(), &QCheckBox::toggled,
-            [this](bool checked) { job_creation_widget_->imagesNameCheckBoxToggled(checked); });
+                             [this](bool checked) { job_creation_widget_->imagesNameCheckBoxToggled(checked); });
 
     QAbstractButton::connect(job_creation_widget_->getImagesFormatCheckBox(), &QCheckBox::toggled,
-            [this](bool checked) { job_creation_widget_->imagesFormatCheckBoxToggled(checked); });
+                             [this](bool checked) { job_creation_widget_->imagesFormatCheckBoxToggled(checked); });
 
     QAbstractButton::connect(job_creation_widget_->getCpuCheckBox(), &QCheckBox::toggled,
-            [this](bool checked) { job_creation_widget_->cpuCheckBoxToggled(checked); });
+                             [this](bool checked) { job_creation_widget_->cpuCheckBoxToggled(checked); });
 
     QAbstractButton::connect(job_creation_widget_->getMemoryCheckBox(), &QCheckBox::toggled,
-            [this](bool checked) { job_creation_widget_->memoryCheckBoxToggled(checked); });
+                             [this](bool checked) { job_creation_widget_->memoryCheckBoxToggled(checked); });
 
     QAbstractButton::connect(job_creation_widget_->getAnalysisCheckBox(), &QCheckBox::toggled,
-            [this](bool checked) { job_creation_widget_->analysisCheckBoxToggled(checked); });
+                             [this](bool checked) { job_creation_widget_->analysisCheckBoxToggled(checked); });
 }
 
 /**
@@ -223,26 +230,33 @@ QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath,
     }
 
     QXmlStreamReader xmlReader(&file);
+    QString currentJobType;
 
     while (!xmlReader.atEnd() && !xmlReader.hasError()) {
         xmlReader.readNext();
-        if (!xmlReader.isStartElement() || xmlReader.name().toString() != "Option") {
-            continue;
+
+        if (xmlReader.isStartElement() && xmlReader.name().toString() == "Option") {
+            currentJobType.clear();  // Reset the current job type for each Option block
         }
 
-        while (xmlReader.readNextStartElement()) {
-            if (xmlReader.name().toString() == "name" && xmlReader.readElementText() == jobType) {
-                while (xmlReader.readNextStartElement()) {
-                    if (xmlReader.name().toString() == "Format") {
-                        formats.append(xmlReader.readElementText());
-                    } else {
-                        xmlReader.skipCurrentElement();
-                    }
-                }
-            } else {
-                xmlReader.skipCurrentElement();
+        if (xmlReader.isStartElement() && xmlReader.name().toString() == "name") {
+            currentJobType = xmlReader.readElementText();
+        }
+
+        if (!currentJobType.isEmpty() && currentJobType == jobType) {
+            if (xmlReader.isStartElement() && xmlReader.name().toString() == "Format") {
+                QString format = xmlReader.readElementText();
+                formats.append(format);
             }
         }
+
+        if (xmlReader.isEndElement() && xmlReader.name().toString() == "Option") {
+            currentJobType.clear();  // Reset the current job type after exiting an Option block
+        }
+    }
+
+    if (xmlReader.hasError()) {
+        throw XmlParseException("Error parsing XML: " + xmlReader.errorString());
     }
 
     file.close();
@@ -508,8 +522,9 @@ QString JobCreation::getLastIndex() const {
             throw BatchCalculationException("The batch calculation value cannot be 0");
         }
         int batch_size = job_creation_widget_->getBatchCalculationSpinBox()->value();
-        int total_images = job_creation_widget_->getLastImageSpinBox()->value() - job_creation_widget_->getFirstImageSpinBox()->value() + 1;
-        int last_batch_index  = (total_images + batch_size - 1) / batch_size;
+        int total_images = job_creation_widget_->getLastImageSpinBox()->value() -
+                           job_creation_widget_->getFirstImageSpinBox()->value() + 1;
+        int last_batch_index = (total_images + batch_size - 1) / batch_size;
         return QString::number(last_batch_index);
     }
     return job_creation_widget_->getLastImageSpinBox()->text();
@@ -737,6 +752,16 @@ QString JobCreation::convertToUncPath(const QString &path) {
     } else {
         throw NotRemoteDriveException("The path " + path + " is not a remote drive");
     }
+}
+
+
+void JobCreation::updateFormatComboBox(const QString &jobType) {
+    qDebug() << "Update format combo box";
+    qDebug() << "Job type parameter: " << jobType;
+    QStringList formats = getFormatsFromConfigFile(config_file_path_, jobType);
+    qDebug() << "Formats : " << formats;
+    job_creation_widget_->getImagesFormatComboBox()->clear();
+    job_creation_widget_->getImagesFormatComboBox()->addItems(formats);
 }
 
 
