@@ -720,6 +720,7 @@ void JobCreation::createAndExecuteJob(QString priority) {
         analysis_script.executeScript("lanceAnalysis.bat");
     }
     incrementJobNumber();
+    job_creation_widget_->saveUserInput();
     QMessageBox::information(nullptr, "Job created", output);
 }
 
