@@ -50,6 +50,8 @@ private:
 
     static QString convertToUncPath(const QString &path);
 
+    void updateFormatComboBox(const QString &jobType);
+
     [[nodiscard]] QString getJobType() const;
 
     [[nodiscard]] QString getJobName() const;

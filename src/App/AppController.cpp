@@ -29,6 +29,8 @@ void AppController::initialize() {
     app_settings_->connectSignalsAndSlots();
     job_creation_->connectSignalsAndSlots();
 
+    app_settings_->loadUserInput();
+
     try {
         copyRemoteConfigFolderToLocal(app_settings_->getRemoteConfigLocation(),
                                       app_settings_->getLocalConfigLocation());
@@ -40,7 +42,6 @@ void AppController::initialize() {
         qCritical() << e.what();
         return;
     }
-
     job_creation_->initialize();
     job_creation_->loadUserInput();
 }
@@ -114,6 +115,7 @@ void AppController::currentTabChanged(int index) {
 
         job_creation_->initialize();
         job_creation_->loadUserInput();
+        app_settings_->loadUserInput();
     }
 
 }

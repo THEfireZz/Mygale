@@ -36,45 +36,45 @@ void Job::checkRequiredParameters(const QString &configPath) const {
     }
 
     QXmlStreamReader xmlReader(&file);
+    QString currentJobType;
 
     while (!xmlReader.atEnd() && !xmlReader.hasError()) {
         xmlReader.readNext();
-        if (!xmlReader.isStartElement() || xmlReader.name().toString() != "Option") {
-            continue;
+
+        if (xmlReader.isStartElement() && xmlReader.name().toString() == "Option") {
+            currentJobType.clear();  // Reset the current job type for each Option block
         }
 
-        while (!xmlReader.atEnd() && !xmlReader.hasError()) {
-            xmlReader.readNext();
-            if (xmlReader.isStartElement() && xmlReader.name().toString() == "Option") {
-                QString currentJobType;
+        if (xmlReader.isStartElement() && xmlReader.name().toString() == "name") {
+            currentJobType = xmlReader.readElementText();
+        }
+
+        if (!currentJobType.isEmpty() && currentJobType == job_type_) {
+            if (xmlReader.isStartElement() && xmlReader.name().toString() == "Required") {
                 while (xmlReader.readNextStartElement()) {
-                    if (xmlReader.name().toString() == "name") {
-                        currentJobType = xmlReader.readElementText();
-                    } else if (!currentJobType.isEmpty() && currentJobType == job_type_) {
-                        if (xmlReader.name().toString() == "Required") {
-                            while (xmlReader.readNextStartElement()) {
-                                if (xmlReader.name().toString() == "option") {
-                                    QString requiredOption = xmlReader.readElementText();
-                                    if (!job_parameters_.contains('<' + requiredOption + '>') ||
-                                        job_parameters_.value('<' + requiredOption + '>').isEmpty()) {
-                                        throw MissingRequiredParameterException(
-                                                "The parameter " + requiredOption + " is required for the job type " +
-                                                job_type_);
-                                    }
-                                } else {
-                                    xmlReader.skipCurrentElement();
-                                }
-                            }
-                        } else {
-                            xmlReader.skipCurrentElement();
+                    if (xmlReader.name().toString() == "option") {
+                        QString requiredOption = xmlReader.readElementText();
+                        if (!job_parameters_.contains('<' + requiredOption + '>') ||
+                            job_parameters_.value('<' + requiredOption + '>').isEmpty()) {
+                            throw MissingRequiredParameterException(
+                                    "The parameter " + requiredOption + " is required for the job type " + job_type_);
                         }
                     } else {
                         xmlReader.skipCurrentElement();
                     }
                 }
             }
+
+            if (xmlReader.isEndElement() && xmlReader.name().toString() == "Option") {
+                currentJobType.clear();  // Reset the current job type after exiting an Option block
+            }
         }
     }
+
+    if (xmlReader.hasError()) {
+        throw XmlParseException("Error while reading the XML file " + file.fileName());
+    }
+    file.close();
 }
 
 /**

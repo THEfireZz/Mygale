@@ -207,6 +207,10 @@ QPushButton *JobCreationWidget::getExecutionPushButton() {
     return ui->executionPushButton;
 }
 
+QPushButton *JobCreationWidget::getPriorityExecutionPushButton() {
+    return ui->priorityExecutionPushButton;
+}
+
 QGridLayout *JobCreationWidget::getPcPoolManagementGridLayout() {
     return ui->pcPoolManagementGridLayout;
 }
