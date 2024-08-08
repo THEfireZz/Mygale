@@ -71,8 +71,7 @@ void AppSettingsWidget::saveUserInput() const {
     settings.beginGroup("AppSettingsWidget");
 
     for (QWidget *widget: this->findChildren<QWidget *>()) {
-        const QString objectName = widget->objectName();
-        if (!objectName.isEmpty()) {
+        if (const QString objectName = widget->objectName(); !objectName.isEmpty()) {
 
             if (auto const *lineEdit = qobject_cast<QLineEdit *>(widget)) {
                 settings.setValue(objectName, lineEdit->text());

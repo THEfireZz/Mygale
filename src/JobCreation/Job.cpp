@@ -1,13 +1,7 @@
 //
 // Created by SD43247 on 04/07/2024.
 //
-
-#include <utility>
-#include <QXmlStreamReader>
-#include <qfile.h>
-
 #include "Job.h++"
-#include "../exception/CustomErrors.h++"
 
 /**
  * @brief This method returns the job name

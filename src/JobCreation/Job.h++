@@ -8,6 +8,9 @@
 #include <QHash>
 #include <QString>
 #include <QDebug>
+#include <utility>
+#include <QXmlStreamReader>
+#include <QFile>
 #include "../exception/CustomErrors.h++"
 
 class Job {

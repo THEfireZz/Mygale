@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QToolButton>
 #include <QAbstractButton>
+#include <QMessageBox>
 #include "AppSettingsWidget.h++"
 
 class AppSettings {

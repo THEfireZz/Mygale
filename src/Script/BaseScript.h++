@@ -6,12 +6,13 @@
 #define MYGALE_BASESCRIPT_H
 
 #include <QProcess>
+#include <utility>
+#include <QFile>
+#include <QDir>
 #include "../JobCreation/Job.h++"
 
 class BaseScript {
 public:
-    QString getLocalScriptPath() const;
-
     explicit BaseScript(Job job,QString remoteScriptPath, QString remoteLaunchersPath, QString localJobLocation);
 
     void replaceScriptParameters(const QString& scriptName, const QString& launcherName) const ;
