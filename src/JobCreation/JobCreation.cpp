@@ -91,6 +91,7 @@ void JobCreation::connectSignalsAndSlots() {
             QMessageBox::critical(nullptr, "Job creation error", e.what());
         } catch (const JobAlreadyExistsException &e) {
             QMessageBox::critical(nullptr, "Job creation error", e.what());
+            incrementJobNumber();
         }
     });
 
