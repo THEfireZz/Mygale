@@ -7,32 +7,63 @@
 #include "AppSettingsWidget.h++"
 #include "../../resources/ui/ui_AppSettingsWidget.h"
 
+/**
+ * @class AppSettingsWidget
+ *
+ * @brief The AppSettingsWidget class is responsible for initializing the app settings widget.
+ **/
 
 AppSettingsWidget::AppSettingsWidget(QWidget *parent) :
         QWidget(parent), ui(new Ui::AppSettingsWidget) {
     ui->setupUi(this);
 }
 
+/**
+ * @brief Destroys the app settings widget.
+ **/
 AppSettingsWidget::~AppSettingsWidget() {
     delete ui;
 }
 
+/**
+ * @brief Returns the remote location line edit.
+ *
+ * @return QLineEdit
+ **/
 QLineEdit *AppSettingsWidget::getRemoteLocationLineEdit() {
     return ui->remoteLocationLineEdit;
 }
 
+/**
+ * @brief Returns the remote location tool button.
+ *
+ * @return QToolButton
+ **/
 QToolButton *AppSettingsWidget::getRemoteLocationToolButton() {
     return ui->remoteLocationToolButton;
 }
 
+/**
+ * @brief Returns the local location line edit.
+ *
+ * @return QLineEdit
+ **/
 QLineEdit *AppSettingsWidget::getLocalLocationLineEdit() {
     return ui->localLocationLineEdit;
 }
 
+/**
+ * @brief Returns the local location tool button.
+ *
+ * @return QToolButton
+ **/
 QToolButton *AppSettingsWidget::getLocalLocationToolButton() {
     return ui->localLocationToolButton;
 }
 
+/**
+ * @brief Saves user input from the app settings widget.
+ **/
 void AppSettingsWidget::saveUserInput() const {
     qDebug() << "Saving user input";
     QSettings settings("Stellantis", "Mygale");

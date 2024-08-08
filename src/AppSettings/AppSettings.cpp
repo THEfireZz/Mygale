@@ -6,10 +6,19 @@
 #include <QMessageBox>
 #include "AppSettings.h++"
 
-AppSettings::AppSettings(AppSettingsWidget *parent) : app_settings_widget_(parent) {
+/**
+ * @class AppSettings
+ *
+ * @brief The AppSettings class is responsible for handling the app settings widget.
+ **/
+
+AppSettings::AppSettings(AppSettingsWidget *app_settings_widget) : app_settings_widget_(app_settings_widget) {
 
 }
 
+/**
+ * @brief Connects signals and slots for the app settings widget.
+ **/
 void AppSettings::connectSignalsAndSlots() {
     QAbstractButton::connect(app_settings_widget_->getRemoteLocationToolButton(), &QAbstractButton::clicked, [this] {
         openRemoteConfigFileDialog();
@@ -20,6 +29,9 @@ void AppSettings::connectSignalsAndSlots() {
     });
 }
 
+/**
+ * @brief Loads user input from the app settings widget into the line edits, combo boxes, check boxes and spin boxes.
+ **/
 void AppSettings::loadUserInput() const {
     QSettings settings("Stellantis", "Mygale");
     settings.beginGroup("MainWindow");
@@ -43,14 +55,9 @@ void AppSettings::loadUserInput() const {
 
 }
 
-QString AppSettings::getRemoteConfigLocation() const {
-    return app_settings_widget_->getRemoteLocationLineEdit()->text();
-}
-
-QString AppSettings::getLocalConfigLocation() const {
-    return app_settings_widget_->getLocalLocationLineEdit()->text();
-}
-
+/**
+ * @brief Opens a file dialog to select the remote config location verifing if the folder contains the mainConfig.xml file and sets the remote location line edit text.
+ **/
 void AppSettings::openRemoteConfigFileDialog() {
     QString remote_config_location = QFileDialog::getExistingDirectory(app_settings_widget_,
                                                                        "Select Remote Config Location",
@@ -64,10 +71,31 @@ void AppSettings::openRemoteConfigFileDialog() {
     app_settings_widget_->getRemoteLocationLineEdit()->setText(remote_config_location);
 }
 
+/**
+ * @brief Opens a file dialog to select the local config location and sets the local location line edit text.
+ **/
 void AppSettings::openLocalConfigFileDialog() {
     QString local_config_location = QFileDialog::getExistingDirectory(app_settings_widget_,
                                                                       "Select Local Config Location",
                                                                       QDir::homePath());
     app_settings_widget_->getLocalLocationLineEdit()->setText(local_config_location);
 
+}
+
+/**
+ * @brief Returns the remote config location.
+ *
+ * @return The remote config location.
+ **/
+QString AppSettings::getRemoteConfigLocation() const {
+    return app_settings_widget_->getRemoteLocationLineEdit()->text();
+}
+
+/**
+ * @brief Returns the local config location.
+ *
+ * @return The local config location.
+ **/
+QString AppSettings::getLocalConfigLocation() const {
+    return app_settings_widget_->getLocalLocationLineEdit()->text();
 }

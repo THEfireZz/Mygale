@@ -9,14 +9,31 @@
 #include "BaseScript.h++"
 #include "../exception/CustomErrors.h++"
 
+/**
+ * @class BaseScript
+ * @brief The BaseScript class is responsible for creating, copying, replacing and executing scripts.
+ *
+ * @param job The job to be executed
+ * @param remoteScriptPath The path of the remote script
+ * @param remoteLaunchersPath The path of the remote launchers
+ * @param localJobLocation The path of the local job location
+ **/
+
 BaseScript::BaseScript(Job job, QString remoteScriptPath, QString remoteLaunchersPath, QString localJobLocation) : job_(
         std::move(job)), remote_script_path_(std::move(remoteScriptPath)), remote_launchers_path_(
         std::move(remoteLaunchersPath)), local_job_location_(std::move(localJobLocation)) {
 
 }
 
-void
-BaseScript::copyRemoteScript(const QString &scriptName, const QString &launcherName) const {
+/**
+ * @brief This method copies the remote script and launchers to the local job location
+ * @param scriptName
+ * @param launcherName
+ *
+ * @throw JobAlreadyExistsException
+ * @throw FileCopyException
+ */
+void BaseScript::copyRemoteScript(const QString &scriptName, const QString &launcherName) const {
     // Create the local job location folder if it does not exist
 
     if (QDir local_job_location(local_job_location_); local_job_location.exists()) {
@@ -29,7 +46,6 @@ BaseScript::copyRemoteScript(const QString &scriptName, const QString &launcherN
 
     // Copy the remote script to the local job location
     if (QFile remote_script(remote_script_path_); !remote_script.copy(local_job_location_ + "lsf\\" + scriptName)) {
-        // throw exception
         throw FileCopyException(
                 "Could not copy the remote script " + remote_script_path_ + " to the local job location " +
                 local_job_location_);
@@ -38,7 +54,6 @@ BaseScript::copyRemoteScript(const QString &scriptName, const QString &launcherN
     // Copy the remote launchers to the local job location
     if (QFile remote_launchers(remote_launchers_path_); !remote_launchers.copy(
             local_job_location_ + "lsf\\" + launcherName)) {
-        // throw exception
         throw FileCopyException(
                 "Could not copy the remote launchers " + remote_launchers_path_ + " to the local job location " +
                 local_job_location_);
@@ -46,11 +61,18 @@ BaseScript::copyRemoteScript(const QString &scriptName, const QString &launcherN
 
 }
 
+/**
+ * @brief This method replaces the script parameters in the script file
+ *
+ * @param scriptName The name of the script file
+ * @param launcherName The name of the launchers file
+ *
+ * @throw FileOpenException
+ **/
 void BaseScript::replaceScriptParameters(const QString &scriptName, const QString &launcherName) const {
     // Open the script file
     QFile script_file(local_job_location_ + "lsf/" + scriptName);
     if (!script_file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-        // throw exception
         throw FileOpenException("Could not open the script file " + script_file.fileName());
     }
 
@@ -72,7 +94,6 @@ void BaseScript::replaceScriptParameters(const QString &scriptName, const QStrin
     // Open the launchers file
     QFile launchers_file(local_job_location_ + "lsf/" + launcherName);
     if (!launchers_file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-        // throw exception
         throw FileOpenException("Could not open the launchers file " + launchers_file.fileName());
     }
 
@@ -91,18 +112,17 @@ void BaseScript::replaceScriptParameters(const QString &scriptName, const QStrin
 }
 
 /**
- * @class BaseScript
- * @brief This method appends the resubmission job execution line to the script file
+ * @brief This method appends the resubmission job execution line to the script
  *
- * @param executionLinePath The path of the file containing the execution line
- * @param scriptName The name of the script file to append the execution line
+ * @param executionLinePath The path of the execution line file
+ * @param scriptName The name of the script file
+ *
+ * @throw FileOpenException
  **/
-
 void BaseScript::appendResubmissionJobExecutionLine(const QString &executionLinePath, const QString &scriptName) const {
     // Open the script file
     QFile script_file(local_job_location_ + "lsf/" + scriptName);
     if (!script_file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-        // throw exception
         throw FileOpenException("Could not open the script file " + script_file.fileName());
     }
 
@@ -113,7 +133,6 @@ void BaseScript::appendResubmissionJobExecutionLine(const QString &executionLine
     // Open the execution line file
     QFile execution_line_file(executionLinePath);
     if (!execution_line_file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        // throw exception
         throw FileOpenException("Could not open the execution line file " + execution_line_file.fileName());
     }
 
@@ -131,6 +150,13 @@ void BaseScript::appendResubmissionJobExecutionLine(const QString &executionLine
 
 }
 
+/**
+ * @brief This method executes the job launchers
+ *
+ * @param scriptName The name of the script file
+ *
+ * @return The output of the script
+ **/
 QString BaseScript::executeScript(const QString &scriptName) const {
     QProcess process;
     process.setWorkingDirectory(local_job_location_ + "lsf");
