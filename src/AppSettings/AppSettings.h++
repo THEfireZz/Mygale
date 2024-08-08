@@ -18,6 +18,8 @@ public:
 
     void connectSignalsAndSlots();
 
+    void loadUserInput() const;
+
     [[nodiscard]] QString getRemoteConfigLocation() const;
 
     [[nodiscard]] QString getLocalConfigLocation() const;

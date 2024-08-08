@@ -19,6 +19,29 @@ void AppSettings::connectSignalsAndSlots() {
     });
 }
 
+void AppSettings::loadUserInput() const {
+    QSettings settings("Stellantis", "Mygale");
+    settings.beginGroup("MainWindow");
+    settings.beginGroup("AppSettingsWidget");
+
+    QStringList keys = settings.childKeys();
+    for (QWidget *widget: app_settings_widget_->findChildren<QWidget *>()) {
+        const QString objectName = widget->objectName();
+        if (keys.contains(objectName)) {
+            if (auto *lineEdit = qobject_cast<QLineEdit *>(widget)) {
+                lineEdit->setText(settings.value(objectName).toString());
+            } else if (auto *comboBox = qobject_cast<QComboBox *>(widget)) {
+                comboBox->setCurrentIndex(settings.value(objectName).toInt());
+            } else if (auto *checkBox = qobject_cast<QCheckBox *>(widget)) {
+                checkBox->setChecked(settings.value(objectName).toBool());
+            } else if (auto *spinBox = qobject_cast<QSpinBox *>(widget)) {
+                spinBox->setValue(settings.value(objectName).toInt());
+            }
+        }
+    }
+
+}
+
 QString AppSettings::getRemoteConfigLocation() const {
     return app_settings_widget_->getRemoteLocationLineEdit()->text();
 }

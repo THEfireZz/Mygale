@@ -23,6 +23,7 @@ JobCreationWidget *MainWindow::getJobCreationWidget() const {
 
 void MainWindow::closeEvent(QCloseEvent *event) {
     ui->jobCreationTab->saveUserInput();
+    ui->appSettingsTab->saveUserInput();
     event->accept();
 }
 

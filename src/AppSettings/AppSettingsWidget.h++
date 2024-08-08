@@ -5,6 +5,11 @@
 #ifndef MYGALE_APPSETTINGSWIDGET_H
 #define MYGALE_APPSETTINGSWIDGET_H
 
+#include <QSettings>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QSpinBox>
+#include <QRadioButton>
 #include <QWidget>
 #include <QLineEdit>
 
@@ -20,6 +25,8 @@ public:
     explicit AppSettingsWidget(QWidget *parent = nullptr);
 
     ~AppSettingsWidget() override;
+
+    void saveUserInput() const;
 
     //Ui getters
 
