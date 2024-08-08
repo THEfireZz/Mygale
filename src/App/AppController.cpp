@@ -3,18 +3,21 @@
 //
 
 #include "AppController.h++"
-
+/**
+ * @class AppController
+ *
+ * @brief The AppController class is responsible for initializing the main window, app settings and job creation widgets.
+ **/
 AppController::AppController(QObject *parent)
         :
         QObject(parent) {
 
 }
 
-/**
- * @class AppController
- * @brief This method initializes application and connects signals and slots
- **/
 
+/**
+ * @brief Initializes the main window, app settings and job creation widgets.
+ **/
 void AppController::initialize() {
 
     main_window_ = std::make_unique<MainWindow>();
@@ -46,14 +49,24 @@ void AppController::initialize() {
     job_creation_->loadUserInput();
 }
 
-
+/**
+ * @brief Connects signals and slots for the main window.
+ **/
 void AppController::connectSignalsAndSlots() {
     //connect main window tab change signal to job creation widget save user input slot
     QObject::connect(main_window_->getTabWidget(), &QTabWidget::currentChanged,
                      [this](int index) { currentTabChanged(index); });
 }
 
-
+/**
+ * @brief Copies the remote config folder to the local config folder.
+ *
+ * @param remoteConfigFolder The remote config folder path.
+ * @param localConfigFolder The local config folder path.
+ *
+ * @throw PathNotFoundException
+ * @throw FileCopyException
+ **/
 void AppController::copyRemoteConfigFolderToLocal(const QString &remoteConfigFolder, const QString &localConfigFolder) {
     qDebug() << "Copying remote config folder to local config folder";
     if (!QDir(remoteConfigFolder).exists()) {
@@ -99,6 +112,11 @@ void AppController::copyRemoteConfigFolderToLocal(const QString &remoteConfigFol
 
 }
 
+/**
+ * @brief Slot for when the current tab is changed.
+ *
+ * @param index The index of the current tab.
+ **/
 void AppController::currentTabChanged(int index) {
     if (index == 0) {
         try {

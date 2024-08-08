@@ -12,7 +12,7 @@
 
 class AppSettings {
 public:
-    explicit AppSettings(AppSettingsWidget *parent = nullptr);
+    explicit AppSettings(AppSettingsWidget *app_settings_widget = nullptr);
 
     ~AppSettings() = default;
 

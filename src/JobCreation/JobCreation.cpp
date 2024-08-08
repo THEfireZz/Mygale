@@ -8,13 +8,19 @@
 #include "JobCreation.h++"
 #include "../exception/CustomErrors.h++"
 
+/**
+ * @class JobCreation
+ * @brief The JobCreation class is responsible for creating and executing jobs
+ *
+ * @param job_creation_widget The job creation widget
+ * @param configFilePath The path to the config file
+ **/
 JobCreation::JobCreation(JobCreationWidget *job_creation_widget, QString configFilePath) : job_creation_widget_(
         job_creation_widget), config_file_path_(std::move(configFilePath)) {
 }
 
 /**
- * @class JobCreation
- * @brief This method initializes the JobCreation class and connects the signals
+ * @brief This method initializes the job creation widget and the comboboxes
  **/
 void JobCreation::initialize() {
     job_creation_widget_->initialize();
@@ -29,6 +35,9 @@ void JobCreation::initialize() {
     job_creation_widget_->getImagesFormatComboBox()->addItems(formats);
 }
 
+/**
+ * @brief This method updates the format combobox depending on the job type
+ **/
 void JobCreation::loadUserInput() const {
     QSettings settings("Stellantis", "Mygale");
     settings.beginGroup("MainWindow");
@@ -52,6 +61,9 @@ void JobCreation::loadUserInput() const {
 
 }
 
+/**
+ * @brief This method connects the signals and slots for the job creation widget
+ **/
 void JobCreation::connectSignalsAndSlots() {
     QAbstractButton::connect(job_creation_widget_->getJobNameToolButton(), &QAbstractButton::clicked, [this] {
         incrementJobNumber();
@@ -120,8 +132,7 @@ void JobCreation::connectSignalsAndSlots() {
 }
 
 /**
- * @class JobCreation
- * @brief This method increments the job number in the job name line edit
+ * @brief This method adds the job number suffix to the job name if there is none or increments the suffix if there is one
  **/
 void JobCreation::incrementJobNumber() {
     QString job_name = job_creation_widget_->getJobNameLineEdit()->text();
@@ -141,8 +152,7 @@ void JobCreation::incrementJobNumber() {
 }
 
 /**
- * @class JobCreation
- * @brief This method opens a file dialog to select a scene file and sets the path in the scene line edit
+ * @brief This method opens a file dialog to select the scene file
  **/
 void JobCreation::openSceneFileDialog() {
     QString filter;
@@ -165,8 +175,7 @@ void JobCreation::openSceneFileDialog() {
 }
 
 /**
- * @class JobCreation
- * @brief This method opens a file dialog to select an output folder and sets the path in the output line edit
+ * @brief This method opens a file dialog to select the output folder
  **/
 void JobCreation::openOutputFolderDialog() {
     QString output_folder = QFileDialog::getExistingDirectory(job_creation_widget_, "Select Output Folder", "I://");
@@ -177,14 +186,14 @@ void JobCreation::openOutputFolderDialog() {
 }
 
 /**
- * @class JobCreation
- * @brief This method reads the xml file and returns a list of job types
+ * @brief This method returns the job types from the config file
  *
- * @param configFilePath the path to xml file containing the job types
+ * @param configFilePath The path to the config file
  *
- * @return a list of job types
+ * @return The job types
  *
- * @throw runtime_error if the file could not be opened
+ * @throw FileOpenException
+ * @throw XmlParseException
  **/
 QStringList JobCreation::getJobTypesFromConfigFile(const QString &configFilePath) {
     QStringList job_types;
@@ -212,13 +221,15 @@ QStringList JobCreation::getJobTypesFromConfigFile(const QString &configFilePath
 }
 
 /**
- * @class JobCreation
- * @brief This method reads the xml file and returns a list of formats for a given job type
+ * @brief This method returns the formats from the config file
  *
- * @param configFilePath the path to xml file containing the formats
- * @param jobType the current job type
+ * @param configFilePath The path to the config file
+ * @param jobType The job type
  *
- * @return a list of formats
+ * @return The formats
+ *
+ * @throw FileOpenException
+ * @throw XmlParseException
  **/
 QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath, const QString &jobType) {
     QStringList formats;
@@ -261,6 +272,18 @@ QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath,
     return formats;
 }
 
+/**
+ * @brief This method returns the job parameter value from the config file
+ *
+ * @param configFilePath The path to the config file
+ * @param jobType The current job type
+ * @param parameter The parameter that needs to be retrieved
+ *
+ * @return The parameter value
+ *
+ * @throw FileOpenException
+ * @throw XmlParseException
+ **/
 QString JobCreation::getJobParameterValueFromConfigFile(const QString &configFilePath, const QString &jobType,
                                                         const QString &parameter) {
     QFile file(configFilePath + "mainConfig.xml");
@@ -303,10 +326,11 @@ QString JobCreation::getJobParameterValueFromConfigFile(const QString &configFil
 }
 
 /**
- * @class JobCreation
- * @brief This method creates a job object with the parameters from the job creation widget
+ * @brief This method creates a job with the given priority using the user input
  *
- * @return a job object
+ * @param priority The job priority
+ *
+ * @return The created job
  **/
 Job JobCreation::createJob(QString priority) {
     QString job_name = getJobName();
@@ -315,9 +339,7 @@ Job JobCreation::createJob(QString priority) {
     QString scene_path = getScenePath();
     QString output_path = getOutputPath();
     QString name = getName();
-    qDebug() << "Name : " << name;
     QString format = getFormat();
-    qDebug() << "Format : " << format;
     QString raw_format = getRawFormat(job_creation_widget_->getImagesFormatComboBox()->currentText());
     QString first_image = getFirstImage();
     QString last_image = getLastImage();
@@ -358,50 +380,45 @@ Job JobCreation::createJob(QString priority) {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the job type from the job creation widget
+ * @brief This method returns the job type
  *
- * @return the job type
+ * @return The job type
  **/
 QString JobCreation::getJobType() const {
     return job_creation_widget_->getJobTypeComboBox()->currentText();
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the job name from the job creation widget
+ * @brief This method returns the job name
  *
- * @return the job name
+ * @return The job name
  **/
 QString JobCreation::getJobName() const {
     return job_creation_widget_->getJobNameLineEdit()->text();
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the scene path from the job creation widget
+ * @brief This method returns the scene path
  *
- * @return the scene path
+ * @return The scene path
  **/
 QString JobCreation::getScenePath() const {
     return convertToUncPath(job_creation_widget_->getSceneLineEdit()->text());
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the output path from the job creation widget
+ * @brief This method returns the output path
  *
- * @return the output path
+ * @return The output path
  **/
 QString JobCreation::getOutputPath() const {
     return convertToUncPath(job_creation_widget_->getOutputLineEdit()->text());
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the name from the job creation widget and adds the prefix if the job type is Maya_2023/Vray and adds the prefix if needed
+ * @brief This method returns the name with the prefix of the job type
  *
- * @return the name
+ * @return The name
  **/
 QString JobCreation::getName() {
     QString xmlPrefix = getJobParameterValueFromConfigFile(config_file_path_,
@@ -415,10 +432,9 @@ QString JobCreation::getName() {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the format from the job creation widget depending on the job type and adds the prefix if the job type is Blender or Maya_2023/Vray and adds the prefix if needed
+ * @brief This method returns the format with the prefix of the job type
  *
- * @return the format
+ * @return The format
  **/
 QString JobCreation::getFormat() const {
     QString xmlPrefix = getJobParameterValueFromConfigFile(config_file_path_,
@@ -438,12 +454,11 @@ QString JobCreation::getFormat() const {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the raw format from the current format selected
+ * @brief This method returns the format extension from the selection
  *
- * @param selection the current format selected
+ * @param selection The selection from the combobox
  *
- * @return the raw format
+ * @return The raw format
  **/
 QString JobCreation::getRawFormat(const QString &selection) {
     static QRegularExpression regex(R"(\[\*\.(\w+)\])");
@@ -454,12 +469,11 @@ QString JobCreation::getRawFormat(const QString &selection) {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the format name from the current format selected
+ * @brief This method returns the format name from the selection
  *
- * @param selection the current format selected
+ * @param selection The selection from the combobox
  *
- * @return the format name
+ * @return The format name
  **/
 QString JobCreation::getFormatName(const QString &selection) {
     static QRegularExpression regex(R"(\b(.*?)\s*\[\*\.)");
@@ -470,10 +484,9 @@ QString JobCreation::getFormatName(const QString &selection) {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the first image from the job creation widget
+ * @brief This method returns the first image
  *
- * @return the first image
+ * @return The first image
  **/
 QString JobCreation::getFirstImage() const {
     if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
@@ -483,10 +496,9 @@ QString JobCreation::getFirstImage() const {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the last image from the job creation widget
+ * @brief This method returns the last image
  *
- * @return the last image
+ * @return The last image
  **/
 QString JobCreation::getLastImage() const {
     if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
@@ -496,10 +508,9 @@ QString JobCreation::getLastImage() const {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the first index (calculated from the first image) from the job creation widget
+ * @brief This method returns the first index
  *
- * @return the first index
+ * @return The first index
  **/
 QString JobCreation::getFirstIndex() const {
     if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
@@ -511,10 +522,11 @@ QString JobCreation::getFirstIndex() const {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the last index (calculated from the last image and the number of batch images) from the job creation widget
+ * @brief This method returns the last index
  *
- * @return the last index
+ * @return The last index
+ *
+ * @throw BatchCalculationException
  **/
 QString JobCreation::getLastIndex() const {
     if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
@@ -533,10 +545,9 @@ QString JobCreation::getLastIndex() const {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the camera name from the job creation widget and adds the prefix if the job type is Maya_2023/Vray and adds the prefix if needed
+ * @brief This method returns the camera name
  *
- * @return the camera name
+ * @return The camera name
  **/
 QString JobCreation::getCameraName() const {
     QString xmlPrefix = getJobParameterValueFromConfigFile(config_file_path_,
@@ -549,10 +560,9 @@ QString JobCreation::getCameraName() const {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the minimum cpu from the job creation widget
+ * @brief This method returns the min cpu
  *
- * @return the minimum cpu
+ * @return The min cpu
  **/
 QString JobCreation::getMinCpu() const {
     if (job_creation_widget_->getCpuCheckBox()->isChecked()) {
@@ -562,10 +572,9 @@ QString JobCreation::getMinCpu() const {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the maximum cpu from the job creation widget if the cpu checkbox is not checked, it returns the default value (32)
+ * @brief This method returns the max cpu
  *
- * @return the maximum cpu
+ * @return The max cpu
  **/
 QString JobCreation::getMaxCpu() const {
     if (job_creation_widget_->getCpuCheckBox()->isChecked()) {
@@ -575,10 +584,11 @@ QString JobCreation::getMaxCpu() const {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the submission option from the job creation widget
+ * @brief This method returns the submission option with the cpu interval, memory interval and parc style list
  *
- * @return the submission option
+ * @return The submission option
+ *
+ * @throw ParcStyleException
  **/
 QString JobCreation::getSubmissionOption() const {
     QString cpuInterval = getCpuInterval();
@@ -603,10 +613,9 @@ QString JobCreation::getSubmissionOption() const {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the cpu interval from the job creation widget
+ * @brief This method returns the cpu interval
  *
- * @return the cpu interval
+ * @return The cpu interval
  **/
 QString JobCreation::getCpuInterval() const {
     if (job_creation_widget_->getCpuCheckBox()->isChecked()) {
@@ -618,10 +627,9 @@ QString JobCreation::getCpuInterval() const {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the memory interval from the job creation widget
+ * @brief This method returns the memory interval
  *
- * @return the memory interval
+ * @return The memory interval
  **/
 QString JobCreation::getMemoryInterval() const {
     if (job_creation_widget_->getMemoryCheckBox()->isChecked()) {
@@ -632,10 +640,9 @@ QString JobCreation::getMemoryInterval() const {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the parc style list from the job creation widget
+ * @brief This method returns the parc style list
  *
- * @return the parc style list
+ * @return The parc style list
  **/
 QString JobCreation::getParcStyleList() const {
     QStringList parcStyleList;
@@ -658,10 +665,9 @@ QString JobCreation::getParcStyleList() const {
 }
 
 /**
- * @class JobCreation
- * @brief This method returns the steps from the job creation widget
+ * @brief This method returns the steps
  *
- * @return the steps
+ * @return The steps
  **/
 QString JobCreation::getSteps() {
     if (job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
@@ -671,10 +677,9 @@ QString JobCreation::getSteps() {
 }
 
 /**
- * @class JobCreation
- * @brief This method creates and executes a job
+ * @brief This method creates and executes a job, the analysis job and the resubmission job if needed with the given priority
  *
- * @param priority the priority of the job
+ * @param priority The job priority
  **/
 void JobCreation::createAndExecuteJob(QString priority) {
     createJob(std::move(priority));
@@ -741,6 +746,16 @@ void JobCreation::createAndExecuteJob(QString priority) {
     QMessageBox::information(nullptr, "Job created", output);
 }
 
+/**
+ * @brief This method converts the path to an UNC path
+ *
+ * @param path The path to convert
+ *
+ * @return The UNC path
+ *
+ * @throw PathNotFoundException
+ * @throw NotRemoteDriveException
+ **/
 QString JobCreation::convertToUncPath(const QString &path) {
     // Path = I:/Mygale/TEMP/JobName/
     QString uncPath = path;
@@ -756,12 +771,13 @@ QString JobCreation::convertToUncPath(const QString &path) {
     }
 }
 
-
+/**
+ * @brief This method updates the format combobox depending on the job type
+ *
+ * @param jobType The job type
+ **/
 void JobCreation::updateFormatComboBox(const QString &jobType) {
-    qDebug() << "Update format combo box";
-    qDebug() << "Job type parameter: " << jobType;
     QStringList formats = getFormatsFromConfigFile(config_file_path_, jobType);
-    qDebug() << "Formats : " << formats;
     job_creation_widget_->getImagesFormatComboBox()->clear();
     job_creation_widget_->getImagesFormatComboBox()->addItems(formats);
 }
