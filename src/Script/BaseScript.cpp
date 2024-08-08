@@ -18,7 +18,10 @@ BaseScript::BaseScript(Job job, QString remoteScriptPath, QString remoteLauncher
 void
 BaseScript::copyRemoteScript(const QString &scriptName, const QString &launcherName) const {
     // Create the local job location folder if it does not exist
-    if (QDir local_job_location(local_job_location_); !local_job_location.exists()) {
+
+    if (QDir local_job_location(local_job_location_); local_job_location.exists()) {
+        throw JobAlreadyExistsException("The job already exists in the local job location " + local_job_location_);
+    } else {
         local_job_location.mkpath(".");
         local_job_location.mkpath("lsf");
         local_job_location.mkpath("appli");
