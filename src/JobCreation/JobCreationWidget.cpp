@@ -3,14 +3,8 @@
 //
 
 // You may need to build the project (run Qt uic code generator) to get "ui_MygaleWidget.h" resolved
-
-#include <QGridLayout>
-#include <qfile.h>
-#include <QXmlStreamReader>
-#include <QSettings>
 #include "JobCreationWidget.h++"
 #include "../../resources/ui/ui_JobCreationWidget.h"
-#include "../exception/CustomErrors.h++"
 
 /**
  * @class JobCreationWidget

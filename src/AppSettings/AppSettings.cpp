@@ -3,7 +3,6 @@
 //
 
 
-#include <QMessageBox>
 #include "AppSettings.h++"
 
 /**

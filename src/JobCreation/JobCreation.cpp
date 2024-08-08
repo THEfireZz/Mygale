@@ -1,12 +1,7 @@
 //
 // Created by SD43247 on 03/07/2024.
 //
-
-#include <utility>
-#include <QSettings>
-
 #include "JobCreation.h++"
-#include "../exception/CustomErrors.h++"
 
 /**
  * @class JobCreation

@@ -11,6 +11,8 @@
 #include <QStorageInfo>
 #include <QMessageBox>
 #include <windows.h>
+#include <utility>
+#include <QSettings>
 #include "JobCreationWidget.h++"
 #include "Job.h++"
 #include "../Script/BaseScript.h++"

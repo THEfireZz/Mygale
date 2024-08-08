@@ -16,6 +16,11 @@
 #include <QGroupBox>
 #include <QPushButton>
 #include <QGridLayout>
+#include <QGridLayout>
+#include <QFile>
+#include <QXmlStreamReader>
+#include <QSettings>
+#include "../exception/CustomErrors.h++"
 
 
 QT_BEGIN_NAMESPACE

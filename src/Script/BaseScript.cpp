@@ -2,12 +2,9 @@
 // Created by SD43247 on 05/07/2024.
 //
 
-#include <utility>
-#include <qfile.h>
-#include <qdir.h>
+
 
 #include "BaseScript.h++"
-#include "../exception/CustomErrors.h++"
 
 /**
  * @class BaseScript
