@@ -14,7 +14,45 @@ find_package(Qt6 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(Mygale src/main.cpp)
+#add the source files
+set(SOURCES
+        src/main.cpp
+        src/App/AppController.cpp
+        src/App/MainWindow.cpp
+        src/JobCreation/JobCreationWidget.cpp
+        src/JobCreation/JobCreation.cpp
+        src/JobCreation/Job.cpp
+        src/Script/BaseScript.cpp
+        src/AppSettings/AppSettings.cpp
+        src/AppSettings/AppSettings.h++
+)
+
+#add the header files
+set(HEADERS
+        src/App/AppController.h++
+        src/App/MainWindow.h++
+        src/JobCreation/JobCreationWidget.h++
+        src/JobCreation/JobCreation.h++
+        src/JobCreation/Job.h++
+        src/Script/BaseScript.h++
+        src/exception/CustomErrors.h++
+)
+
+#add the ui files
+set(UIS
+        resources/ui/MainWindow.ui
+        resources/ui/JobCreationWidget.ui
+        src/AppSettings/AppSettingsWidget.cpp
+        src/AppSettings/AppSettingsWidget.h++
+        resources/ui/AppSettingsWidget.ui
+)
+
+add_executable(Mygale
+        ${SOURCES}
+        ${HEADERS}
+        ${UIS}
+)
+
 target_link_libraries(Mygale
         Qt::Core
         Qt::Gui
