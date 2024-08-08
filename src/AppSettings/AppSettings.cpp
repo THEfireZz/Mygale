@@ -3,6 +3,7 @@
 //
 
 
+#include <QMessageBox>
 #include "AppSettings.h++"
 
 AppSettings::AppSettings(AppSettingsWidget *parent) : app_settings_widget_(parent) {
@@ -54,6 +55,12 @@ void AppSettings::openRemoteConfigFileDialog() {
     QString remote_config_location = QFileDialog::getExistingDirectory(app_settings_widget_,
                                                                        "Select Remote Config Location",
                                                                        QDir::homePath());
+    //check if the folder contains the mainConfig.xml file
+    if (!QFile::exists(remote_config_location + "/mainConfig.xml")) {
+        QMessageBox::warning(app_settings_widget_, "Config folder error",
+                             "The selected folder does not contain the mainConfig.xml file");
+        return;
+    }
     app_settings_widget_->getRemoteLocationLineEdit()->setText(remote_config_location);
 }
 
