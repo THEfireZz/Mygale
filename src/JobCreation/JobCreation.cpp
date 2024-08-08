@@ -81,6 +81,17 @@ void JobCreation::connectSignalsAndSlots() {
         }
     });
 
+    QAbstractButton::connect(job_creation_widget_->getPriorityExecutionPushButton(), &QAbstractButton::clicked, [this] {
+        try {
+            createAndExecuteJob("75");
+        } catch (const JobAlreadyExistsException &e) {
+            QMessageBox::critical(nullptr, "Job creation error", e.what());
+            incrementJobNumber();
+        } catch (const CustomErrors &e) {
+            QMessageBox::critical(nullptr, "Job creation error", e.what());
+        }
+    });
+
 
     //Handle elements enable/disable
     QAbstractButton::connect(job_creation_widget_->getSingleImageRadioButton(), &QRadioButton::toggled,
