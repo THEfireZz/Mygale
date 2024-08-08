@@ -73,25 +73,11 @@ void JobCreation::connectSignalsAndSlots() {
     QAbstractButton::connect(job_creation_widget_->getExecutionPushButton(), &QAbstractButton::clicked, [this] {
         try {
             createAndExecuteJob("50");
-        } catch (const FileCopyException &e) {
-            QMessageBox::critical(nullptr, "Job creation error", e.what());
-        } catch (const FileOpenException &e) {
-            QMessageBox::critical(nullptr, "Job creation error", e.what());
-        } catch (const ParcStyleException &e) {
-            QMessageBox::critical(nullptr, "Job creation error", e.what());
-        } catch (const BatchCalculationException &e) {
-            QMessageBox::critical(nullptr, "Job creation error", e.what());
-        } catch (const PathNotFoundException &e) {
-            QMessageBox::critical(nullptr, "Job creation error", e.what());
-        } catch (const NotRemoteDriveException &e) {
-            QMessageBox::critical(nullptr, "Job creation error", e.what());
-        } catch (const MissingRequiredParameterException &e) {
-            QMessageBox::critical(nullptr, "Job creation error", e.what());
-        } catch (const XmlParseException &e) {
-            QMessageBox::critical(nullptr, "Job creation error", e.what());
         } catch (const JobAlreadyExistsException &e) {
             QMessageBox::critical(nullptr, "Job creation error", e.what());
             incrementJobNumber();
+        } catch (const CustomErrors &e) {
+            QMessageBox::critical(nullptr, "Job creation error", e.what());
         }
     });
 
