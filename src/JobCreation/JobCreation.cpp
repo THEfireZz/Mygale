@@ -249,8 +249,13 @@ QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath,
 
         if (!currentJobType.isEmpty() && currentJobType == jobType) {
             if (xmlReader.isStartElement() && xmlReader.name().toString() == "Format") {
-                QString format = xmlReader.readElementText();
-                formats.append(format);
+                while (xmlReader.readNextStartElement()) {
+                    if (xmlReader.name().toString() == "Option") {
+                        formats.append(xmlReader.readElementText());
+                    } else {
+                        xmlReader.skipCurrentElement();
+                    }
+                }
             }
         }
 
