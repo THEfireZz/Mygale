@@ -587,8 +587,11 @@ QString JobCreation::getMaxCpu() const {
 QString JobCreation::getSubmissionOption() const {
     QString cpuInterval = getCpuInterval();
     QString memoryInterval = getMemoryInterval();
+    QString vredOption = getJobParameterValueFromConfigFile(config_file_path_, job_creation_widget_->getJobTypeComboBox()->currentText(), "SubmissionOption");
     QString parcStyleList = getParcStyleList();
 
+    qDebug() << "jobType : " << job_creation_widget_->getJobTypeComboBox()->currentText();
+    qDebug() << "vredOption : " << vredOption;
     QStringList submissionOptions;
 
     if (!cpuInterval.isEmpty()) {
@@ -596,6 +599,9 @@ QString JobCreation::getSubmissionOption() const {
     }
     if (!memoryInterval.isEmpty()) {
         submissionOptions.append(memoryInterval);
+    }
+    if (!vredOption.isEmpty()) {
+        submissionOptions.append(vredOption);
     }
     if (!parcStyleList.isEmpty()) {
         submissionOptions.append(parcStyleList);
