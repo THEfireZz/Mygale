@@ -24,7 +24,7 @@ set(SOURCES
         src/JobCreation/Job.cpp
         src/Script/BaseScript.cpp
         src/AppSettings/AppSettings.cpp
-        src/AppSettings/AppSettings.h++
+        src/AppSettings/AppSettingsWidget.cpp
 )
 
 #add the header files
@@ -36,27 +36,33 @@ set(HEADERS
         src/JobCreation/Job.h++
         src/Script/BaseScript.h++
         src/exception/CustomErrors.h++
+        src/AppSettings/AppSettings.h++
+        src/AppSettings/AppSettingsWidget.h++
 )
 
 #add the ui files
 set(UIS
         resources/ui/MainWindow.ui
         resources/ui/JobCreationWidget.ui
-        src/AppSettings/AppSettingsWidget.cpp
-        src/AppSettings/AppSettingsWidget.h++
         resources/ui/AppSettingsWidget.ui
 )
 
-add_executable(Mygale
+#add the qrc files
+set(QRC
+        resources/resources.qrc
+)
+
+qt_add_executable(Mygale
         ${SOURCES}
         ${HEADERS}
         ${UIS}
+        ${QRC}
 )
 
 target_link_libraries(Mygale
-        Qt::Core
-        Qt::Gui
-        Qt::Widgets
+       PRIVATE Qt::Core
+       PRIVATE Qt::Gui
+       PRIVATE Qt::Widgets
 )
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
