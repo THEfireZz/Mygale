@@ -249,8 +249,13 @@ QStringList JobCreation::getFormatsFromConfigFile(const QString &configFilePath,
 
         if (!currentJobType.isEmpty() && currentJobType == jobType) {
             if (xmlReader.isStartElement() && xmlReader.name().toString() == "Format") {
-                QString format = xmlReader.readElementText();
-                formats.append(format);
+                while (xmlReader.readNextStartElement()) {
+                    if (xmlReader.name().toString() == "Option") {
+                        formats.append(xmlReader.readElementText());
+                    } else {
+                        xmlReader.skipCurrentElement();
+                    }
+                }
             }
         }
 
@@ -510,10 +515,8 @@ QString JobCreation::getLastImage() const {
 QString JobCreation::getFirstIndex() const {
     if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
         return job_creation_widget_->getSingleImageSpinBox()->text();
-    } else if (job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
-        return "1";
     }
-    return job_creation_widget_->getFirstImageSpinBox()->text();
+    return "1";
 }
 
 /**
@@ -524,6 +527,9 @@ QString JobCreation::getFirstIndex() const {
  * @throw BatchCalculationException
  **/
 QString JobCreation::getLastIndex() const {
+    int total_images = job_creation_widget_->getLastImageSpinBox()->value() -
+                       job_creation_widget_->getFirstImageSpinBox()->value() + 1;
+
     if (job_creation_widget_->getSingleImageRadioButton()->isChecked()) {
         return job_creation_widget_->getSingleImageSpinBox()->text();
     } else if (job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
@@ -531,12 +537,10 @@ QString JobCreation::getLastIndex() const {
             throw BatchCalculationException("The batch calculation value cannot be 0");
         }
         int batch_size = job_creation_widget_->getBatchCalculationSpinBox()->value();
-        int total_images = job_creation_widget_->getLastImageSpinBox()->value() -
-                           job_creation_widget_->getFirstImageSpinBox()->value() + 1;
         int last_batch_index = (total_images + batch_size - 1) / batch_size;
         return QString::number(last_batch_index);
     }
-    return job_creation_widget_->getLastImageSpinBox()->text();
+    return QString::number(total_images);
 }
 
 /**
@@ -588,8 +592,11 @@ QString JobCreation::getMaxCpu() const {
 QString JobCreation::getSubmissionOption() const {
     QString cpuInterval = getCpuInterval();
     QString memoryInterval = getMemoryInterval();
+    QString vredOption = getJobParameterValueFromConfigFile(config_file_path_, job_creation_widget_->getJobTypeComboBox()->currentText(), "SubmissionOption");
     QString parcStyleList = getParcStyleList();
 
+    qDebug() << "jobType : " << job_creation_widget_->getJobTypeComboBox()->currentText();
+    qDebug() << "vredOption : " << vredOption;
     QStringList submissionOptions;
 
     if (!cpuInterval.isEmpty()) {
@@ -597,6 +604,9 @@ QString JobCreation::getSubmissionOption() const {
     }
     if (!memoryInterval.isEmpty()) {
         submissionOptions.append(memoryInterval);
+    }
+    if (!vredOption.isEmpty()) {
+        submissionOptions.append(vredOption);
     }
     if (!parcStyleList.isEmpty()) {
         submissionOptions.append(parcStyleList);
@@ -668,7 +678,7 @@ QString JobCreation::getSteps() {
     if (job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
         return QString::number(job_creation_widget_->getBatchCalculationSpinBox()->value());
     }
-    return {};
+    return {"1"};
 }
 
 /**
@@ -681,13 +691,8 @@ void JobCreation::createAndExecuteJob(QString priority) {
     qDebug() << "Job created : " << job_.getJobName();
     QString jobType = job_.getJobType();
     QString remote_script_path;
-    if (!job_creation_widget_->getBatchCalculationCheckBox()->isChecked()) {
-        remote_script_path =
-                config_file_path_ + getJobParameterValueFromConfigFile(config_file_path_, jobType, "skeleton");
-    } else {
-        remote_script_path = config_file_path_ +
-                             getJobParameterValueFromConfigFile(config_file_path_, jobType, "skeletonMultipleImage");
-    }
+    remote_script_path =
+            config_file_path_ + getJobParameterValueFromConfigFile(config_file_path_, jobType, "skeleton");
 
     QString remote_launchers_path = config_file_path_ + R"(lance.txt)";
 

@@ -40,7 +40,7 @@ void JobCreationWidget::loadPcPoolManagmentChoice() {
     int row = 0;
     int column = 0;
 
-    QFile file(R"(I:\Mygale\Config_Blender_4_V2\mainConfig.xml)");
+    QFile file(R"(I:\Mygale\Config_Blender_4_V2\mainConfig.xml)"); //TODO: change to config file path
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         throw FileOpenException("Could not open the file " + file.fileName());
     }
