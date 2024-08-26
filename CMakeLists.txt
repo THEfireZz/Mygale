@@ -52,7 +52,7 @@ set(QRC
         resources/resources.qrc
 )
 
-qt_add_executable(Mygale
+qt_add_executable(Mygale WIN32
         ${SOURCES}
         ${HEADERS}
         ${UIS}
